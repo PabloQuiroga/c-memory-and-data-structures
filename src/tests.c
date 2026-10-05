@@ -59,3 +59,32 @@ int test_da_get() {
     da_destroy(array);
     return 1;
 }
+
+// TEST 4: Verificar la eliminación y el desplazamiento de elementos
+int test_da_remove() {
+    DynamicArray *array = NULL;
+    da_create(&array, 10);
+
+    int v1 = 10, v2 = 20, v3 = 30;
+    da_add(array, &v1); // Index 0
+    da_add(array, &v2); // Index 1
+    da_add(array, &v3); // Index 2
+
+    // Eliminamos el elemento del medio (valor 20 en index 1)
+    int result = da_remove(array, 1);
+
+    ASSERT_TRUE(result == 0, "da_remove should return 0");
+    ASSERT_TRUE(array->size == 2, "Size should decrease to 2");
+
+    // Verificamos que el elemento en index 1 ahora sea el valor 30 (desplazamiento)
+    void *out = NULL;
+    da_get(array, 1, &out);
+    ASSERT_TRUE(*(int*)out == 30, "Element at index 1 should now be 30");
+
+    // Probar eliminación fuera de rango
+    int err_result = da_remove(array, 100);
+    ASSERT_TRUE(err_result == -1, "da_remove should return -1 for out-of-bounds");
+
+    da_destroy(array);
+    return 1;
+}
