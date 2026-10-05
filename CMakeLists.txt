@@ -11,4 +11,5 @@ add_executable(c_memory_and_data_structures
         src/dynamic_array.h
         src/tests.c
         src/linked_list.h
-        src/linked_list.c)
+        src/linked_list.c
+)

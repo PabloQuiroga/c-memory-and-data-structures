@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dynamic_array.h"
+#include "linked_list.h"
 #include "test_framework.h"
 
 // TEST 1: Verificar que la creación funciona
@@ -86,5 +87,69 @@ int test_da_remove() {
     ASSERT_TRUE(err_result == -1, "da_remove should return -1 for out-of-bounds");
 
     da_destroy(array);
+    return 1;
+}
+
+// TEST 5: Verificar la creación y destrucción de la lista
+int test_ll_create_destroy() {
+    LinkedList *list = NULL;
+    int result = ll_create(&list);
+
+    ASSERT_TRUE(result == 0, "ll_create should return 0");
+    ASSERT_TRUE(list != NULL, "List should not be NULL");
+    ASSERT_TRUE(list->head == NULL, "Initial head should be NULL");
+    ASSERT_TRUE(list->size == 0, "Initial size should be 0");
+
+    int destroy_result = ll_destroy(list);
+    ASSERT_TRUE(destroy_result == 0, "ll_destroy should return 0");
+
+    return 1;
+}
+
+// TEST 6: Verificar inserción en cabeza y cola
+int test_ll_insertions() {
+    LinkedList *list = NULL;
+    ll_create(&list);
+
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    ll_insert_head(list, &v1); // List: 10
+    ll_insert_head(list, &v2); // List: 20 -> 10
+    ll_insert_tail(list, &v3); // List: 20 -> 10 -> 30
+
+    ASSERT_TRUE(list->size == 3, "Size should be 3");
+
+    void *out = NULL;
+    ll_get(list, 0, &out);
+    ASSERT_TRUE(*(int*)out == 20, "Index 0 should be 20");
+
+    ll_get(list, 2, &out);
+    ASSERT_TRUE(*(int*)out == 30, "Index 2 should be 30");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// TEST 7: Verificar la eliminación y el re-linkeo
+int test_ll_remove() {
+    LinkedList *list = NULL;
+    ll_create(&list);
+
+    int v1 = 10, v2 = 20, v3 = 30;
+    ll_insert_tail(list, &v1);
+    ll_insert_tail(list, &v2);
+    ll_insert_tail(list, &v3);
+
+    // Eliminamos el nodo del medio (index 1, valor 20)
+    int result = ll_remove(list, 1);
+
+    ASSERT_TRUE(result == 0, "ll_remove should return 0");
+    ASSERT_TRUE(list->size == 2, "Size should be 2");
+
+    void *out = NULL;
+    ll_get(list, 1, &out);
+    ASSERT_TRUE(*(int*)out == 30, "Index 1 should now be 30");
+
+    ll_destroy(list);
     return 1;
 }
