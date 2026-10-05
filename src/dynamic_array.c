@@ -75,6 +75,26 @@ int da_get(DynamicArray *array, size_t index, void **out_element) {
     return 0; // Éxito
 }
 
+int da_remove(DynamicArray *array, size_t index) {
+    if (array == NULL) return -1;
+
+    // 1. Validación de límites
+    if (index >= array->size) {
+        return -1; // Error: Índice fuera de rango
+    }
+
+    // 2. Desplazamiento de elementos (Shifting)
+    // Movemos todos los elementos desde index + 1 hasta el final una posición a la izquierda
+    for (size_t i = index; i < array->size - 1; i++) {
+        array->data[i] = array->data[i + 1];
+    }
+
+    // 3. Actualizar el tamaño
+    array->size--;
+
+    return 0; // Éxito
+}
+
 int da_destroy(DynamicArray *array) {
     if (array == NULL) return -1;
 

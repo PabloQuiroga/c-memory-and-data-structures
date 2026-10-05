@@ -50,7 +50,20 @@ int main() {
     if (da_get(my_array, 100, &element_ptr) != 0) { //Llamamos con indice 100
         printf("Correctly handled out-of-bounds access at index 100\n");
     }
-    
+
+    printf("\n--- Testing Removal ---\n");
+    printf("Removing element at index 1 (value 20)...\n");
+    if (da_remove(my_array, 1) == 0) {
+        printf("Success! New size: %zu\n", da_get_size(my_array));//Llamamos a la función de tamaño
+    }
+
+    printf("Verifying elements after removal:\n");
+    for (int i = 0; i < da_get_size(my_array); i++) {
+        if (da_get(my_array, i, &element_ptr) == 0) {
+            printf("Index %d: %d\n", i, *(int *)element_ptr);
+        }
+    }// Deberías ver: Index 0: 10, Index 1: 30, Index 2: 40 (el 20 desapareció)
+
     // 4. Limpieza de memoria
     da_destroy(my_array);
     printf("\nMemory freed. Program finished successfully.\n");
