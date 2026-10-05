@@ -60,6 +60,21 @@ size_t da_get_capacity(DynamicArray *array) {
     return array ? array->capacity : 0;
 }
 
+int da_get(DynamicArray *array, size_t index, void **out_element) {
+    if (array == NULL || out_element == NULL) return -1;
+
+    // 1. Validación de límites (Boundary Check)
+    // Si el índice es mayor o igual al tamaño actual, es un error
+    if (index >= array->size) {
+        return -1; // Error: Índice fuera de rango
+    }
+
+    // 2. Asignar la dirección del elemento al puntero de salida
+    *out_element = array->data[index];
+
+    return 0; // Éxito
+}
+
 int da_destroy(DynamicArray *array) {
     if (array == NULL) return -1;
 

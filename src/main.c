@@ -35,6 +35,22 @@ int main() {
     printf("Total elements: %zu\n", da_get_size(my_array));
     printf("Final capacity: %zu\n", da_get_capacity(my_array));//Llamamos a la función de capacidad
 
+    printf("\n--- Verifying elements ---\n");
+    void *element_ptr = NULL;
+    for (int i = 0; i < 4; i++) {
+        if (da_get(my_array, i, &element_ptr) == 0) {
+            // Como sabemos que guardamos enteros, hacemos un cast a (int*)
+            printf("Element at index %d: %d\n", i, *(int *)element_ptr);
+        } else {
+            printf("Error getting element at index %d\n", i);
+        }
+    }
+
+    // Intentar obtener un elemento fuera de rango para probar el error
+    if (da_get(my_array, 100, &element_ptr) != 0) { //Llamamos con indice 100
+        printf("Correctly handled out-of-bounds access at index 100\n");
+    }
+    
     // 4. Limpieza de memoria
     da_destroy(my_array);
     printf("\nMemory freed. Program finished successfully.\n");
