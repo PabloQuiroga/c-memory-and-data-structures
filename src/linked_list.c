@@ -84,3 +84,54 @@ size_t ll_get_size(LinkedList *list) {
     if (list == NULL) return 0;
     return list->size;
 }
+
+int ll_get(LinkedList *list, size_t index, void **out_element) {
+    if (list == NULL || out_element == NULL) return -1;
+
+    Node *current = list->head;
+    size_t current_index = 0;
+
+    // Caminamos por la lista hasta llegar al índice deseado
+    while (current != NULL) {
+        if (current_index == index) {
+            *out_element = current->data;
+            return 0; // Éxito: encontramos el elemento
+        }
+        current = current->next;
+        current_index++;
+    }
+
+    return -1; // Error: El índice está fuera de rango (llegamos al final de la lista)
+}
+
+int ll_remove(LinkedList *list, size_t index) {
+    if (list == NULL || list->head == NULL) return -1;
+
+    Node *current = list->head;
+    Node *previous = NULL;
+    size_t current_index = 0;
+
+    // 1. Buscar el nodo a eliminar y mantener el rastro del anterior
+    while (current != NULL && current_index < index) {
+        previous = current;
+        current = current->next;
+        current_index++;
+    }
+
+    // Si current es NULL, el índice estaba fuera de rango
+    if (current == NULL) return -1;
+
+    // 2. Caso Especial: Eliminar la cabeza (head)
+    if (previous == NULL) {
+        list->head = current->next;
+    } else {
+        // Caso General: Saltamos el nodo actual conectando el anterior con el siguiente
+        previous->next = current->next;
+    }
+
+    // 3. Liberar la memoria del nodo eliminado y actualizar tamaño
+    free(current);
+    list->size--;
+
+    return 0;
+}

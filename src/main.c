@@ -50,6 +50,26 @@ int main() {
     // El orden debería ser: 200 -> 100 -> 300
     printf("Final list size: %zu\n", ll_get_size(my_list));
 
+    printf("\n--- Verifying Linked List elements ---\n");
+    void *element_ptr = NULL;
+    for (size_t i = 0; i < ll_get_size(my_list); i++) {
+        if (ll_get(my_list, i, &element_ptr) == 0) {
+            printf("Index %zu: %d\n", i, *(int *)element_ptr);
+               }
+    }
+
+    printf("\nRemoving element at index 1...\n");
+    if (ll_remove(my_list, 1) == 0) {
+        printf("Success! New size: %zu\n", ll_get_size(my_list));
+    }
+
+    printf("Verifying after removal:\n");
+    for (size_t i = 0; i < ll_get_size(my_list); i++) {
+        if (ll_get(my_list, i, &element_ptr) == 0) {
+            printf("Index %zu: %d\n", i, *(int *)element_ptr);
+               }
+    }
+
     ll_destroy(my_list);
     printf("List destroyed. Memory freed.\n");
 }
