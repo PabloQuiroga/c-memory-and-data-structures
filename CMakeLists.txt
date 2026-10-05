@@ -8,4 +8,5 @@ include_directories(src)
 add_executable(c_memory_and_data_structures
         src/main.c
         src/dynamic_array.c
-        src/dynamic_array.h)
+        src/dynamic_array.h
+        src/tests.c)
