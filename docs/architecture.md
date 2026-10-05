@@ -11,7 +11,7 @@ typedef struct {
     size_t capacity;    // Total allocated capacity
 } DynamicArray;
 ```
-Design Justification
+### Design Justification
 - `void **data`: We use a pointer to pointers because the array must be generic. This allows the array to store pointers to any data type regardless of its size.
 - `size_t`: Used instead of `int` to ensure compatibility with large memory addresses and to avoid negative values.
   
