@@ -3,6 +3,8 @@
 //
 
 #include <stdio.h>
+
+#include "linked_list.h"
 #include "test_framework.h"
 
 // Declaramos los tests que están en tests.c
@@ -22,5 +24,32 @@ int main() {
     printf("========================================\n");
     printf("All tests completed.\n");
 
-    return 0;
+    // return 0;
+
+    printf("\n\n=== TESTING LINKED LIST ===\n");
+    LinkedList *my_list = NULL;
+    if (ll_create(&my_list) != 0) {
+        printf("Error creating list\n");
+        return 1;
+    }
+
+    int v1 = 100, v2 = 200, v3 = 300;
+
+    printf("Inserting 100 at head... ");
+    ll_insert_head(my_list, &v1);
+    printf("Success! Size: %zu\n", ll_get_size(my_list));
+
+    printf("Inserting 200 at head... ");
+    ll_insert_head(my_list, &v2);
+    printf("Success! Size: %zu\n", ll_get_size(my_list));
+
+    printf("Inserting 300 at tail... ");
+    ll_insert_tail(my_list, &v3);
+    printf("Success! Size: %zu\n", ll_get_size(my_list));
+
+    // El orden debería ser: 200 -> 100 -> 300
+    printf("Final list size: %zu\n", ll_get_size(my_list));
+
+    ll_destroy(my_list);
+    printf("List destroyed. Memory freed.\n");
 }

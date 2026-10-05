@@ -49,3 +49,38 @@ int ll_insert_head(LinkedList *list, void *element) {
 
     return 0;
 }
+
+int ll_insert_tail(LinkedList *list, void *element) {
+    if (list == NULL) return -1;
+
+    // 1. Crear el nuevo nodo
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    if (new_node == NULL) return -1;
+
+    new_node->data = element;
+    new_node->next = NULL; // Como será el último, no apunta a nadie
+
+    // 2. Caso especial: si la lista está vacía
+    if (list->head == NULL) {
+        list->head = new_node;
+        list->size++;
+        return 0;
+    }
+
+    // 3. Recorrer la lista hasta encontrar el último nodo
+    Node *current = list->head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    // 4. Enganchar el nuevo nodo al final
+    current->next = new_node;
+    list->size++;
+
+    return 0;
+}
+
+size_t ll_get_size(LinkedList *list) {
+    if (list == NULL) return 0;
+    return list->size;
+}
