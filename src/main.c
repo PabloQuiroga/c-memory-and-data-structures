@@ -15,6 +15,8 @@ int test_da_remove();
 int test_ll_create_destroy();
 int test_ll_insertions();
 int test_ll_remove();
+int test_stack_basic_operations();
+int test_stack_edge_cases();
 
 int main() {
     printf("=== RUNNING DYNAMIC ARRAY UNIT TESTS ===\n");
@@ -32,6 +34,12 @@ int main() {
     RUN_TEST(test_ll_remove);
 
     printf("========================================\n");
+
+    printf("\n=== RUNNING STACK UNIT TESTS ===\n");
+    RUN_TEST(test_stack_basic_operations);
+    RUN_TEST(test_stack_edge_cases);
+
+    printf("================================\n");
 
     printf("All tests completed.\n");
 

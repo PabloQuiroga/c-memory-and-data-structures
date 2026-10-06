@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "dynamic_array.h"
 #include "linked_list.h"
+#include "stack.h"
 #include "test_framework.h"
 
 // TEST 1: Verificar que la creación funciona
@@ -151,5 +152,59 @@ int test_ll_remove() {
     ASSERT_TRUE(*(int*)out == 30, "Index 1 should now be 30");
 
     ll_destroy(list);
+    return 1;
+}
+
+// TEST 8: Verificar el ciclo de vida y operaciones básicas del Stack
+int test_stack_basic_operations() {
+    Stack *stack = NULL;
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    // 1. Creación
+    ASSERT_TRUE(stack_create(&stack) == 0, "stack_create should return 0");
+    ASSERT_TRUE(stack_is_empty(stack), "Stack should be empty initially");
+
+    // 2. Push (LIFO: 10 -> 20 -> 30)
+    stack_push(stack, &v1);
+    stack_push(stack, &v2);
+    stack_push(stack, &v3);
+    ASSERT_TRUE(!stack_is_empty(stack), "Stack should not be empty after push");
+
+    // 3. Peek (Debe ser el último que entró: 30)
+    void *top = stack_peek(stack);
+    ASSERT_TRUE(*(int*)top == 30, "Peek should return the last element (30)");
+
+    // 4. Pop (Saca el 30, ahora el tope es 20)
+    void *popped = NULL;
+    // Nota: En nuestra implementación actual, pop solo remueve.
+    // Para obtener el valor, hacemos peek antes de pop.
+    top = stack_peek(stack);
+    ASSERT_TRUE(*(int*)top == 30, "Top before pop should be 30");
+
+    // Implementamos la eliminación del tope
+    int pop_res = stack_pop(stack, &popped);
+    // Nota: Revisando stack.c, stack_pop llama a ll_remove(list, 0)
+    ASSERT_TRUE(pop_res == 0, "stack_pop should return 0");
+
+    // 5. Verificar nuevo tope (debe ser 20)
+    top = stack_peek(stack);
+    ASSERT_TRUE(*(int*)top == 20, "Top after pop should be 20");
+
+    stack_destroy(stack);
+    return 1;
+}
+
+// TEST 9: Verificar stack vacío y errores
+int test_stack_edge_cases() {
+    Stack *stack = NULL;
+    stack_create(&stack);
+
+    // Intentar hacer peek en stack vacío
+    ASSERT_TRUE(stack_peek(stack) == NULL, "Peek on empty stack should return NULL");
+
+    // Intentar hacer pop en stack vacío
+    ASSERT_TRUE(stack_pop(stack, NULL) == -1, "Pop on empty stack should return -1");
+
+    stack_destroy(stack);
     return 1;
 }
