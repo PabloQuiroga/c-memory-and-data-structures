@@ -12,4 +12,6 @@ add_executable(c_memory_and_data_structures
         src/tests.c
         src/linked_list.h
         src/linked_list.c
+        src/stack.h
+        src/stack.c
 )
