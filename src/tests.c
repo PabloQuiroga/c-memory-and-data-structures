@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dynamic_array.h"
+#include "hash_table.h"
 #include "linked_list.h"
 #include "stack.h"
 #include "test_framework.h"
@@ -206,5 +207,70 @@ int test_stack_edge_cases() {
     ASSERT_TRUE(stack_pop(stack, NULL) == -1, "Pop on empty stack should return -1");
 
     stack_destroy(stack);
+    return 1;
+}
+
+// TEST 10: Verificar inserción y recuperación básica
+int test_ht_basic_operations() {
+    HashTable *table = NULL;
+    ht_create(&table, 10);
+
+    char *key = "Pablo";
+    char *val = "Developer";
+
+    ht_insert(table, key, val);
+
+    void *out = NULL;
+    int result = ht_get(table, key, &out);
+
+    // COMPARACIÓN CORRECTA: Comparar el puntero recuperado con el puntero original
+    ASSERT_TRUE(result == 0, "ht_get should return 0");
+    ASSERT_TRUE(out == val, "The pointer retrieved should be the same as the pointer inserted");
+
+    ht_destroy(table);
+    return 1;
+}
+
+// TEST 11: Verificar el manejo de colisiones (Chaining)
+int test_ht_collisions() {
+    HashTable *table = NULL;
+    ht_create(&table, 1); // Capacidad 1 para forzar colisiones
+
+    char *k1 = "Key1";
+    char *v1 = "Val1";
+    char *k2 = "Key2";
+    char *v2 = "Val2";
+
+    ht_insert(table, k1, v1);
+    ht_insert(table, k2, v2);
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 2, "Bucket 0 should have 2 elements");
+
+    void *out = NULL;
+    ht_get(table, k1, &out);
+    ASSERT_TRUE(out == v1, "Should retrieve Val1 for Key1");
+
+    ht_get(table, k2, &out);
+    ASSERT_TRUE(out == v2, "Should retrieve Val2 for Key2");
+
+    ht_destroy(table);
+    return 1;
+}
+
+// TEST 12: Verificar la eliminación y limpieza
+int test_ht_remove() {
+    HashTable *table = NULL;
+    ht_create(&table, 10);
+
+    char *k = "TestKey";
+    char *v = "TestVal";
+    ht_insert(table, k, v);
+
+    ASSERT_TRUE(ht_remove(table, k) == 0, "ht_remove should return 0");
+
+    void *out = NULL;
+    ASSERT_TRUE(ht_get(table, k, &out) == -1, "Key should no longer exist");
+
+    ht_destroy(table);
     return 1;
 }
