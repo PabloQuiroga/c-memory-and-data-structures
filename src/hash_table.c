@@ -47,9 +47,22 @@ int ht_create(HashTable **table, size_t capacity) {
 int ht_destroy(HashTable *table) {
     if (table == NULL) return -1;
 
-    // Destruimos cada lista en cada bucket
     for (size_t i = 0; i < table->capacity; i++) {
-        ll_destroy(table->buckets[i]);
+        LinkedList *list = table->buckets[i];
+        if (list == NULL) continue;
+
+        // Recorremos la lista manualmente para liberar cada HashEntry
+        Node *current = list->head;
+        while (current != NULL) {
+            Node *next = current->next;
+            // IMPORTANTE: Liberamos la entrada antes que el nodo
+            free(current->data);
+            free(current);
+            current = next;
+        }
+
+        // Liberamos la estructura de la lista
+        free(list);
     }
 
     free(table->buckets);
@@ -96,4 +109,30 @@ int ht_get(HashTable *table, void *key, void **out_value) {
     }
 
     return -1; // No se encontró la clave
+}
+
+int ht_remove(HashTable *table, void *key) {
+    if (table == NULL || key == NULL) return -1;
+
+    // 1. Calculamos el índice del bucket
+    unsigned long hash = hash_function((const char *)key);
+    size_t index = hash % table->capacity;
+    LinkedList *list = table->buckets[index];
+
+    // 2. Buscamos el elemento en la lista
+    for (size_t i = 0; i < ll_get_size(list); i++) {
+        void *entry_ptr = NULL;
+        ll_get(list, i, &entry_ptr);
+        HashEntry *entry = (HashEntry *)entry_ptr;
+
+        if (entry->key == key) {
+            // 3. Liberamos la memoria de la HashEntry antes de remover el nodo
+            free(entry);
+
+            // 4. Removemos el nodo de la lista
+            return ll_remove(list, i);
+        }
+    }
+
+    return -1; // Clave no encontrada
 }
