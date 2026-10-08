@@ -274,3 +274,57 @@ int test_ht_remove() {
     ht_destroy(table);
     return 1;
 }
+
+// TEST 13: Edge Cases - Dynamic Array
+int test_da_edge_cases() {
+    DynamicArray *array = NULL;
+    da_create(&array, 5);
+
+    void *out = NULL;
+    // Acceso fuera de rango
+    ASSERT_TRUE(da_get(array, 10, &out) == -1, "da_get should fail for out-of-bounds");
+    ASSERT_TRUE(da_remove(array, 0) == -1, "da_remove should fail for empty array");
+
+    da_destroy(array);
+    return 1;
+}
+
+// TEST 14: Edge Cases - Linked List
+int test_ll_edge_cases() {
+    LinkedList *list = NULL;
+    ll_create(&list);
+
+    int val = 10;
+    ll_insert_head(list, &val);
+
+    // Eliminar el único elemento
+    ASSERT_TRUE(ll_remove(list, 0) == 0, "ll_remove should work for single element");
+    ASSERT_TRUE(list->head == NULL, "Head should be NULL after removing only element");
+    ASSERT_TRUE(list->size == 0, "Size should be 0");
+
+    // Intentar borrar en lista vacía
+    ASSERT_TRUE(ll_remove(list, 0) == -1, "ll_remove should fail for empty list");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// TEST 15: Edge Cases - Hash Table
+int test_ht_edge_cases() {
+    HashTable *table = NULL;
+    ht_create(&table, 5);
+
+    void *out = NULL;
+    // Buscar en tabla vacía
+    ASSERT_TRUE(ht_get(table, "NonExistent", &out) == -1, "ht_get should fail for empty table");
+
+    char *k = "Key";
+    char *v = "Val";
+    ht_insert(table, k, v);
+
+    // Eliminar clave que no existe
+    ASSERT_TRUE(ht_remove(table, "WrongKey") == -1, "ht_remove should fail for non-existent key");
+
+    ht_destroy(table);
+    return 1;
+}

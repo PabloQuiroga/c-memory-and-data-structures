@@ -21,6 +21,9 @@ int test_stack_edge_cases();
 int test_ht_basic_operations();
 int test_ht_collisions();
 int test_ht_remove();
+int test_da_edge_cases();
+int test_ll_edge_cases();
+int test_ht_edge_cases();
 
 int main() {
     printf("=== RUNNING DYNAMIC ARRAY UNIT TESTS ===\n");
@@ -51,6 +54,11 @@ int main() {
     RUN_TEST(test_ht_remove);
 
     printf("======================================\n");
+
+    printf("\n=== RUNNING EDGE CASE TESTS ===\n");
+    RUN_TEST(test_da_edge_cases);
+    RUN_TEST(test_ll_edge_cases);
+    RUN_TEST(test_ht_edge_cases);
 
     printf("All tests completed.\n");
 }
