@@ -24,3 +24,8 @@ Implement a generic Hash Table in C using the "Separate Chaining" technique to h
 | Insertion | $O(1)$ | $O(1)$ |
 | Retrieval | $O(1)$ | $O(1)$ |
 | Removal | $O(1)$ | $O(1)$ |
+
+## 5. Edge Case Behavior
+- **Empty Table**: `ht_get` and `ht_remove` must return `-1` if the table is empty or the key is not found.
+- **Collision Handling**: Multiple keys mapping to the same bucket must be stored in the linked list and retrieved correctly.
+- **Non-existent Keys**: Attempting to remove a key that does not exist must return `-1` without modifying the table.

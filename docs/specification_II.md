@@ -35,3 +35,8 @@ Consistent with the portfolio's architecture, the list must use `void*` pointers
 | Insert at Tail | $O(n)$ | $O(1)$ |
 | Access by Index | $O(n)$ | $O(1)$ |
 | Removal | $O(n)$ | $O(1)$ |
+
+## 5. Edge Case Behavior
+- **Empty List**: `ll_get` and `ll_remove` must return `-1` if the head is `NULL`.
+- **Single Element**: Removing the only element must result in `head = NULL` and `size = 0`.
+- **Tail Removal**: Removing the last element must correctly update the second-to-last node's `next` pointer to `NULL`.

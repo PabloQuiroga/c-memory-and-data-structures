@@ -33,3 +33,8 @@ To support any data type, the implementation must use `void*` pointers. The arra
 | Append (Average) | $O(1)$ | $O(1)$ |
 | Append (Worst case) | $O(n)$ | $O(n)$ |
 | Removal | $O(n)$ | $O(1)$ |
+
+## 5. Edge Case Behavior
+- **Empty Array**: `da_get` and `da_remove` must return `-1` if called when `size == 0`.
+- **Out of Bounds**: Any access or removal at `index >= size` must return `-1`.
+- **Allocation Failure**: If `realloc` fails during growth, the original array must remain intact and the function must return `-1`.
