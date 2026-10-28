@@ -1,7 +1,7 @@
 # Architecture: Generic Dynamic Array
 
 ## 1. Data Structure Design
-The Dynamic Array will be implemented using a `struct` that manages a contiguous block of memory.
+The Dynamic Array is implemented using a `struct that manages a contiguous block of memory.
 
 ### Struct Definition
 ```c
@@ -12,12 +12,12 @@ typedef struct {
 } DynamicArray;
 ```
 ### Design Justification
-- `void **data`: We use a pointer to pointers because the array must be generic. This allows the array to store pointers to any data type regardless of its size.
+- `void **data`: Allows the array to store pointers to objects of different data types. The array manages the storage of these pointers, but it does not allocate, copy, or free the objects they point to.
 - `size_t`: Used instead of `int` to ensure compatibility with large memory addresses and to avoid negative values.
   
 ## 2. API Definition (Interface)
 
-The library will expose the following functions. All functions will return an integer error code (`0` for success, `-1` for failure).
+The library exposes the following functions. Functions that return int use 0 for success and -1 for failure. The utility functions da_get_size and da_get_capacity return 0 when passed a NULL pointer.
 
 ### 2.1 Lifecycle Management
 - `int da_create(DynamicArray **array, size_t initial_capacity)`
@@ -31,7 +31,7 @@ The library will expose the following functions. All functions will return an in
 - `int da_get(DynamicArray *array, size_t index, void **out_element)`
     - Retrieves the pointer at the given index.
 - `int da_remove(DynamicArray *array, size_t index)`
-    - Removes the element and shifts others to the left.
+  - Removes the element at the specified index and shifts subsequent elements one position to the left. The function does not free the object pointed to by the removed element.
 
 ### 2.3 Utility
 - `size_t da_get_size(DynamicArray *array)`
