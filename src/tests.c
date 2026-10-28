@@ -4,10 +4,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "dynamic_array.h"
-#include "hash_table.h"
-#include "linked_list.h"
-#include "stack.h"
+#include "data_structures/dynamic_array.h"
+#include "data_structures/hash_table.h"
+#include "data_structures/linked_list.h"
+#include "data_structures/stack.h"
 #include "test_framework.h"
 
 // TEST 1: Verificar que la creación funciona

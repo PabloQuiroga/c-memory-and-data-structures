@@ -2,10 +2,6 @@
 // Created by Pablo Quiroga on 04/10/2026.
 //
 
-#include <stdio.h>
-
-#include "hash_table.h"
-#include "linked_list.h"
 #include "test_framework.h"
 
 // Declaramos los tests que están en tests.c
