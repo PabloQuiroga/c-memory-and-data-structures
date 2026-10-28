@@ -84,26 +84,33 @@ Documentación: [Especificación](docs/data_structures/hash_table/specification.
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
-│   ├── decisions/
-│   │   ├── ADR-001.md
-│   │   └── ADR-002.md
-│   ├── specification.md
-│   ├── specification_II.md
-│   ├── specification_stack.md
-│   ├── specification_ht.md
-│   ├── architecture.md
-│   ├── architecture_II.md
-│   ├── architecture_stack.md
-│   └── architecture_ht.md
+│   │
+│   ├── data_structures/
+│   │   ├── dynamic_array/
+│   │   │   ├── specification.md
+│   │   │   └── architecture.md
+│   │   ├── linked_list/
+│   │   │   ├── specification.md
+│   │   │   └── architecture.md
+│   │   ├── stack/
+│   │   │   ├── specification.md
+│   │   │   └── architecture.md
+│   │   └── hash_table/
+│   │       ├── specification.md
+│   │       └── architecture.md
+│   └── decisions/
+│       ├── ADR-001.md
+│       └── ADR-002.md
 ├── src/
-│   ├── dynamic_array.c
-│   ├── dynamic_array.h
-│   ├── linked_list.c
-│   ├── linked_list.h
-│   ├── stack.c
-│   ├── stack.h
-│   ├── hash_table.c
-│   ├── hash_table.h
+│   ├── data_structures/
+│   │   ├── dynamic_array.c
+│   │   ├── dynamic_array.h
+│   │   ├── linked_list.c
+│   │   ├── linked_list.h
+│   │   ├── stack.c
+│   │   ├── stack.h
+│   │   ├── hash_table.c
+│   │   └── hash_table.h
 │   ├── main.c
 │   ├── tests.c
 │   └── test_framework.h
