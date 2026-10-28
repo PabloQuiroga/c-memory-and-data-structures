@@ -278,6 +278,13 @@ int test_ht_remove() {
 // TEST 13: Edge Cases - Dynamic Array
 int test_da_edge_cases() {
     DynamicArray *array = NULL;
+
+    ASSERT_TRUE(da_create(NULL, 5) == -1,
+                "da_create should fail when output pointer is NULL");
+
+    ASSERT_TRUE(da_create(&array, 0) == -1,
+                "da_create should fail when initial capacity is zero");
+
     da_create(&array, 5);
 
     void *out = NULL;

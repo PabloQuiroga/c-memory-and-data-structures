@@ -6,6 +6,10 @@
 #include <stdlib.h> // Para malloc, realloc y free
 
 int da_create(DynamicArray **array, size_t initial_capacity) {
+    // Verifica si el array esta en null o el tamaño es cero
+    if (array == NULL || initial_capacity == 0) {
+        return -1;
+    }
     // 1. Reservar memoria para la estructura DynamicArray
     *array = (DynamicArray *)malloc(sizeof(DynamicArray));
     if (*array == NULL) {

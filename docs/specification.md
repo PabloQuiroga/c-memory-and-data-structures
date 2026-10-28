@@ -38,3 +38,4 @@ To support any data type, the implementation must use `void*` pointers. The arra
 - **Empty Array**: `da_get` and `da_remove` must return `-1` if called when `size == 0`.
 - **Out of Bounds**: Any access or removal at `index >= size` must return `-1`.
 - **Allocation Failure**: If `realloc` fails during growth, the original array must remain intact and the function must return `-1`.
+- **Invalid Initial Capacity**: `da_create` must return `-1` if the output pointer is `NULL` or if `initial_capacity` is zero.
