@@ -26,7 +26,7 @@ Operaciones principales:
 - Eliminación por índice.
 - Consulta de tamaño y capacidad.
 
-Documentación: [Especificación](docs/specification.md) · [Diseño](docs/architecture.md)
+Documentación: [Especificación](docs/data_structures/dynamic_array/specification.md) · [Diseño](docs/data_structures/dynamic_array/architecture.md)
 
 ### Singly Linked List — Lista simplemente enlazada
 
@@ -39,7 +39,7 @@ Operaciones principales:
 - Eliminación por índice.
 - Consulta de tamaño.
 
-Documentación: [Especificación](docs/specification_II.md) · [Diseño](docs/architecture_II.md)
+Documentación: [Especificación](docs/data_structures/linked_list/specification.md) · [Diseño](docs/data_structures/linked_list/architecture.md)
 
 ### Stack — Pila LIFO
 
@@ -53,7 +53,7 @@ Operaciones principales:
 - `peek`: consulta el elemento superior.
 - `is_empty`: comprueba si la pila está vacía.
 
-Documentación: [Especificación](docs/specification_stack.md) · [Diseño](docs/architecture_stack.md)
+Documentación: [Especificación](docs/data_structures/stack/specification.md) · [Diseño](docs/data_structures/stack/architecture.md)
 
 ### Hash Table — Tabla hash
 
@@ -65,7 +65,7 @@ Operaciones principales:
 - Búsqueda por clave.
 - Eliminación por clave.
 
-Documentación: [Especificación](docs/specification_ht.md) · [Diseño](docs/architecture_ht.md)
+Documentación: [Especificación](docs/data_structures/hash_table/specification.md) · [Diseño](docs/data_structures/hash_table/architecture.md)
 
 ## Tecnologías y conceptos
 
