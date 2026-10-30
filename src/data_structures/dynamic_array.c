@@ -12,7 +12,9 @@ int da_create(DynamicArray **array, size_t initial_capacity) {
     // Inicializamos la salida para evitar dejar un puntero inválido
     *array = NULL;
 
-    if (initial_capacity == 0) return -1;
+    if (initial_capacity == 0 || initial_capacity > SIZE_MAX / sizeof(void *)) {
+        return -1;
+    }
 
     // 1. Reservar memoria para la estructura DynamicArray
     *array = (DynamicArray *)malloc(sizeof(DynamicArray));
@@ -22,6 +24,7 @@ int da_create(DynamicArray **array, size_t initial_capacity) {
 
     // 2. Reservar memoria para el buffer de punteros (los datos)
     (*array)->data = (void **)malloc(initial_capacity * sizeof(void *));
+
     if ((*array)->data == NULL) {
         free(*array); // Liberamos la estructura para no dejar basura
         *array = NULL; //
@@ -110,6 +113,7 @@ int da_remove(DynamicArray *array, size_t index) {
 
     // 3. Actualizar el tamaño
     array->size--;
+    array->data[array->size] = NULL; // Limpia la referencia residual
 
     return 0; // Éxito
 }

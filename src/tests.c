@@ -27,19 +27,28 @@ int test_da_create() {
 // TEST 2: Verificar que el agregado y el crecimiento funcionan
 int test_da_add_and_resize() {
     DynamicArray *array = NULL;
-    da_create(&array, 2);
+
+    ASSERT_TRUE(da_create(&array, 2) == 0,
+                "da_create should succeed");
 
     int val1 = 10, val2 = 20, val3 = 30;
 
-    da_add(array, &val1);
-    da_add(array, &val2);
+    ASSERT_TRUE(da_add(array, &val1) == 0,
+                "First insertion should succeed");
+
+    ASSERT_TRUE(da_add(array, &val2) == 0,
+                "Second insertion should succeed");
+
     ASSERT_TRUE(array->size == 2, "Size should be 2");
     ASSERT_TRUE(array->capacity == 2, "Capacity should still be 2");
 
     // Esto debería disparar la redimensión (capacity 2 -> 4)
-    da_add(array, &val3);
+    ASSERT_TRUE(da_add(array, &val3) == 0,
+                "Third insertion should succeed");
+
     ASSERT_TRUE(array->size == 3, "Size should be 3");
-    ASSERT_TRUE(array->capacity == 4, "Capacity should have doubled to 4");
+    ASSERT_TRUE(array->capacity == 4,
+                "Capacity should have doubled to 4");
 
     da_destroy(array);
     return 1;
@@ -48,10 +57,14 @@ int test_da_add_and_resize() {
 // TEST 3: Verificar que el acceso por índice funciona
 int test_da_get() {
     DynamicArray *array = NULL;
-    da_create(&array, 5);
+
+    ASSERT_TRUE(da_create(&array, 5) == 0,
+                "da_create should succeed");
 
     int val = 100;
-    da_add(array, &val);
+
+    ASSERT_TRUE(da_add(array, &val) == 0,
+                "Insertion should succeed");
 
     void *out = NULL;
     int result = da_get(array, 0, &out);
@@ -66,12 +79,15 @@ int test_da_get() {
 // TEST 4: Verificar la eliminación y el desplazamiento de elementos
 int test_da_remove() {
     DynamicArray *array = NULL;
-    da_create(&array, 10);
+
+    ASSERT_TRUE(da_create(&array, 10) == 0,
+                "da_create should succeed");
 
     int v1 = 10, v2 = 20, v3 = 30;
-    da_add(array, &v1); // Index 0
-    da_add(array, &v2); // Index 1
-    da_add(array, &v3); // Index 2
+
+    ASSERT_TRUE(da_add(array, &v1) == 0, "First insertion should succeed");
+    ASSERT_TRUE(da_add(array, &v2) == 0, "Second insertion should succeed");
+    ASSERT_TRUE(da_add(array, &v3) == 0, "Third insertion should succeed");
 
     // Eliminamos el elemento del medio (valor 20 en index 1)
     int result = da_remove(array, 1);
@@ -92,7 +108,109 @@ int test_da_remove() {
     return 1;
 }
 
-// TEST 5: Verificar la creación y destrucción de la lista
+// TEST 5: Verificar que la creación rechaza una capacidad inicial cero
+int test_da_create_invalid_capacity() {
+    DynamicArray *array = NULL;
+
+    int result = da_create(&array, 0);
+
+    ASSERT_TRUE(result == -1, "da_create should return -1 for zero capacity");
+    ASSERT_TRUE(array == NULL, "Array should remain NULL");
+
+    return 1;
+}
+
+// TEST 6: Verificar que la creación rechaza un puntero de salida NULL
+int test_da_create_null_pointer() {
+    int result = da_create(NULL, 5);
+
+    ASSERT_TRUE(result == -1, "da_create should return -1 for NULL output pointer");
+
+    return 1;
+}
+
+// TEST 7: Verificar que da_get rechaza un puntero de salida NULL
+int test_da_get_null_output() {
+    DynamicArray *array = NULL;
+
+    int create_result = da_create(&array, 5);
+
+    ASSERT_TRUE(create_result == 0, "da_create should return 0");
+
+    int value = 100;
+    da_add(array, &value);
+
+    int result = da_get(array, 0, NULL);
+
+    ASSERT_TRUE(result == -1, "da_get should return -1 for NULL output pointer");
+
+    da_destroy(array);
+    return 1;
+}
+
+// TEST 8: Verificar que da_remove limpia la referencia residual
+int test_da_remove_clears_reference() {
+    DynamicArray *array = NULL;
+
+    int create_result = da_create(&array, 5);
+
+    ASSERT_TRUE(create_result == 0, "da_create should return 0");
+
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    da_add(array, &v1);
+    da_add(array, &v2);
+    da_add(array, &v3);
+
+    int result = da_remove(array, 1);
+
+    ASSERT_TRUE(result == 0, "da_remove should return 0");
+    ASSERT_TRUE(array->size == 2, "Size should decrease to 2");
+    ASSERT_TRUE(array->data[2] == NULL, "Last position should be NULL after removal");
+
+    da_destroy(array);
+    return 1;
+}
+
+// TEST 9: Verificar que da_get rechaza índices fuera de rango
+int test_da_get_out_of_bounds() {
+    DynamicArray *array = NULL;
+
+    int create_result = da_create(&array, 5);
+
+    ASSERT_TRUE(create_result == 0, "da_create should return 0");
+
+    int value = 100;
+    da_add(array, &value);
+
+    void *out = NULL;
+    int result = da_get(array, 1, &out);
+
+    ASSERT_TRUE(result == -1, "da_get should return -1 for out-of-bounds index");
+
+    da_destroy(array);
+    return 1;
+}
+
+// TEST 10: Verificar que da_remove rechaza operaciones sobre un arreglo vacío
+int test_da_remove_empty_array() {
+    DynamicArray *array = NULL;
+
+    int create_result = da_create(&array, 5);
+
+    ASSERT_TRUE(create_result == 0, "da_create should return 0");
+    ASSERT_TRUE(array->size == 0, "Array should be empty");
+
+    int result = da_remove(array, 0);
+
+    ASSERT_TRUE(result == -1, "da_remove should return -1 for an empty array");
+    ASSERT_TRUE(array->size == 0, "Array size should remain 0");
+
+    da_destroy(array);
+    return 1;
+}
+
+// TEST 6: Verificar la creación y destrucción de la lista
 int test_ll_create_destroy() {
     LinkedList *list = NULL;
     int result = ll_create(&list);
@@ -108,7 +226,7 @@ int test_ll_create_destroy() {
     return 1;
 }
 
-// TEST 6: Verificar inserción en cabeza y cola
+// TEST 7: Verificar inserción en cabeza y cola
 int test_ll_insertions() {
     LinkedList *list = NULL;
     ll_create(&list);
@@ -132,7 +250,7 @@ int test_ll_insertions() {
     return 1;
 }
 
-// TEST 7: Verificar la eliminación y el re-linkeo
+// TEST 8: Verificar la eliminación y el re-linkeo
 int test_ll_remove() {
     LinkedList *list = NULL;
     ll_create(&list);
@@ -156,7 +274,7 @@ int test_ll_remove() {
     return 1;
 }
 
-// TEST 8: Verificar el ciclo de vida y operaciones básicas del Stack
+// TEST 9: Verificar el ciclo de vida y operaciones básicas del Stack
 int test_stack_basic_operations() {
     Stack *stack = NULL;
     int v1 = 10, v2 = 20, v3 = 30;
@@ -195,7 +313,7 @@ int test_stack_basic_operations() {
     return 1;
 }
 
-// TEST 9: Verificar stack vacío y errores
+// TEST 10: Verificar stack vacío y errores
 int test_stack_edge_cases() {
     Stack *stack = NULL;
     stack_create(&stack);
@@ -210,7 +328,7 @@ int test_stack_edge_cases() {
     return 1;
 }
 
-// TEST 10: Verificar inserción y recuperación básica
+// TEST 11: Verificar inserción y recuperación básica
 int test_ht_basic_operations() {
     HashTable *table = NULL;
     ht_create(&table, 10);
@@ -231,7 +349,7 @@ int test_ht_basic_operations() {
     return 1;
 }
 
-// TEST 11: Verificar el manejo de colisiones (Chaining)
+// TEST 12: Verificar el manejo de colisiones (Chaining)
 int test_ht_collisions() {
     HashTable *table = NULL;
     ht_create(&table, 1); // Capacidad 1 para forzar colisiones
@@ -257,7 +375,7 @@ int test_ht_collisions() {
     return 1;
 }
 
-// TEST 12: Verificar la eliminación y limpieza
+// TEST 1: Verificar la eliminación y limpieza
 int test_ht_remove() {
     HashTable *table = NULL;
     ht_create(&table, 10);

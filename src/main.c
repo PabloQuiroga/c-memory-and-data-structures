@@ -9,6 +9,12 @@ int test_da_create();
 int test_da_add_and_resize();
 int test_da_get();
 int test_da_remove();
+int test_da_create_invalid_capacity();
+int test_da_create_null_pointer();
+int test_da_get_null_output();
+int test_da_remove_clears_reference();
+int test_da_get_out_of_bounds();
+int test_da_remove_empty_array();
 int test_ll_create_destroy();
 int test_ll_insertions();
 int test_ll_remove();
@@ -28,6 +34,12 @@ int main() {
     RUN_TEST(test_da_add_and_resize);
     RUN_TEST(test_da_get);
     RUN_TEST(test_da_remove);
+    RUN_TEST(test_da_create_invalid_capacity);
+    RUN_TEST(test_da_create_null_pointer);
+    RUN_TEST(test_da_get_null_output);
+    RUN_TEST(test_da_remove_clears_reference);
+    RUN_TEST(test_da_get_out_of_bounds);
+    RUN_TEST(test_da_remove_empty_array);
 
     printf("========================================\n");
 
