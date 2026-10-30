@@ -25,9 +25,12 @@ The library exposes the following functions. Functions that return `int` use `0`
   - Creates a new dynamic array by allocating the structure and its internal buffer.
   - Returns `-1` if `array` is `NULL`, `initial_capacity` is zero, or a memory allocation fails.
 - `int da_destroy(DynamicArray *array)`
-  - Frees the internal buffer and the `DynamicArray` structure.
+  - Frees the internal buffer and the DynamicArray structure.
   - Does not free the objects pointed to by the stored elements.
-  - Returns `-1` if `array` is `NULL`.
+  - Returns -1 if array is NULL.
+  - The function receives the array pointer by value. Therefore, it cannot set the caller's pointer to NULL after releasing the memory.
+  - After a successful call, the caller must not access or reuse the original pointer, as it becomes a dangling pointer.
+  - The caller is responsible for managing the lifetime of the pointer and avoiding subsequent use after destruction.
 
 ### 2.2 Element Manipulation
 
