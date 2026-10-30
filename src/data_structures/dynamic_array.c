@@ -4,12 +4,16 @@
 
 #include "dynamic_array.h"
 #include <stdlib.h> // Para malloc, realloc y free
+#include <stdint.h> // Para SIZE_MAX
 
 int da_create(DynamicArray **array, size_t initial_capacity) {
-    // Verifica si el array esta en null o el tamaño es cero
-    if (array == NULL || initial_capacity == 0) {
-        return -1;
-    }
+    if (array == NULL) return -1;
+
+    // Inicializamos la salida para evitar dejar un puntero inválido
+    *array = NULL;
+
+    if (initial_capacity == 0) return -1;
+
     // 1. Reservar memoria para la estructura DynamicArray
     *array = (DynamicArray *)malloc(sizeof(DynamicArray));
     if (*array == NULL) {
@@ -20,6 +24,7 @@ int da_create(DynamicArray **array, size_t initial_capacity) {
     (*array)->data = (void **)malloc(initial_capacity * sizeof(void *));
     if ((*array)->data == NULL) {
         free(*array); // Liberamos la estructura para no dejar basura
+        *array = NULL; //
         return -1; // Error: No hay memoria para el buffer
     }
 
@@ -35,8 +40,18 @@ int da_add(DynamicArray *array, void *element) {
 
     // 1. Verificar si el arreglo está lleno
     if (array->size == array->capacity) {
+        // Verificamos que duplicar la capacidad no produzca un desbordamiento
+        if (array->capacity > SIZE_MAX / 2) {
+            return -1;
+        }
+
         // Calculamos la nueva capacidad (el doble)
         size_t new_capacity = array->capacity * 2;
+
+        // Verificamos que el tamaño solicitado no produzca un desbordamiento
+        if (new_capacity > SIZE_MAX / sizeof(void *)) {
+            return -1;
+        }
 
         // Intentamos redimensionar el buffer de punteros
         void **new_data = (void **)realloc(array->data, new_capacity * sizeof(void *));
