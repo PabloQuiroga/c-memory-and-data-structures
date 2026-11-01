@@ -10,7 +10,7 @@
 #include "data_structures/stack.h"
 #include "test_framework.h"
 
-// TEST 1: Verificar que la creación funciona
+// Dynamic Array: Verificar que la creación funciona
 int test_da_create() {
     DynamicArray *array = NULL;
     int result = da_create(&array, 5);
@@ -24,7 +24,7 @@ int test_da_create() {
     return 1;
 }
 
-// TEST 2: Verificar que el agregado y el crecimiento funcionan
+// Dynamic Array: Verificar que el agregado y el crecimiento funcionan
 int test_da_add_and_resize() {
     DynamicArray *array = NULL;
 
@@ -54,7 +54,7 @@ int test_da_add_and_resize() {
     return 1;
 }
 
-// TEST 3: Verificar que el acceso por índice funciona
+// Dynamic Array: Verificar que el acceso por índice funciona
 int test_da_get() {
     DynamicArray *array = NULL;
 
@@ -76,7 +76,7 @@ int test_da_get() {
     return 1;
 }
 
-// TEST 4: Verificar la eliminación y el desplazamiento de elementos
+// Dynamic Array: Verificar la eliminación y el desplazamiento de elementos
 int test_da_remove() {
     DynamicArray *array = NULL;
 
@@ -108,7 +108,7 @@ int test_da_remove() {
     return 1;
 }
 
-// TEST 5: Verificar que la creación rechaza una capacidad inicial cero
+// Dynamic Array: Verificar que la creación rechaza una capacidad inicial cero
 int test_da_create_invalid_capacity() {
     DynamicArray *array = NULL;
 
@@ -120,7 +120,7 @@ int test_da_create_invalid_capacity() {
     return 1;
 }
 
-// TEST 6: Verificar que la creación rechaza un puntero de salida NULL
+// Dynamic Array: Verificar que la creación rechaza un puntero de salida NULL
 int test_da_create_null_pointer() {
     int result = da_create(NULL, 5);
 
@@ -129,7 +129,7 @@ int test_da_create_null_pointer() {
     return 1;
 }
 
-// TEST 7: Verificar que da_get rechaza un puntero de salida NULL
+// Dynamic Array: Verificar que da_get rechaza un puntero de salida NULL
 int test_da_get_null_output() {
     DynamicArray *array = NULL;
 
@@ -148,7 +148,7 @@ int test_da_get_null_output() {
     return 1;
 }
 
-// TEST 8: Verificar que da_remove limpia la referencia residual
+// Dynamic Array: Verificar que da_remove limpia la referencia residual
 int test_da_remove_clears_reference() {
     DynamicArray *array = NULL;
 
@@ -172,7 +172,7 @@ int test_da_remove_clears_reference() {
     return 1;
 }
 
-// TEST 9: Verificar que da_get rechaza índices fuera de rango
+// Dynamic Array: Verificar que da_get rechaza índices fuera de rango
 int test_da_get_out_of_bounds() {
     DynamicArray *array = NULL;
 
@@ -192,7 +192,7 @@ int test_da_get_out_of_bounds() {
     return 1;
 }
 
-// TEST 10: Verificar que da_remove rechaza operaciones sobre un arreglo vacío
+// Dynamic Array: Verificar que da_remove rechaza operaciones sobre un arreglo vacío
 int test_da_remove_empty_array() {
     DynamicArray *array = NULL;
 
@@ -210,71 +210,343 @@ int test_da_remove_empty_array() {
     return 1;
 }
 
-// TEST 6: Verificar la creación y destrucción de la lista
+// Linked List: Verificar la creación y destrucción de la lista
 int test_ll_create_destroy() {
     LinkedList *list = NULL;
-    int result = ll_create(&list);
 
-    ASSERT_TRUE(result == 0, "ll_create should return 0");
-    ASSERT_TRUE(list != NULL, "List should not be NULL");
-    ASSERT_TRUE(list->head == NULL, "Initial head should be NULL");
-    ASSERT_TRUE(list->size == 0, "Initial size should be 0");
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should return 0");
+    ASSERT_TRUE(list != NULL,
+                "List should not be NULL");
+    ASSERT_TRUE(list->head == NULL,
+                "Initial head should be NULL");
+    ASSERT_TRUE(list->size == 0,
+                "Initial size should be 0");
 
-    int destroy_result = ll_destroy(list);
-    ASSERT_TRUE(destroy_result == 0, "ll_destroy should return 0");
+    int values[] = {10, 20, 30};
+
+    ASSERT_TRUE(ll_insert_head(list, &values[0]) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &values[1]) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &values[2]) == 0,
+                "Third insertion should succeed");
+
+    ASSERT_TRUE(ll_get_size(list) == 3,
+                "List should contain three nodes before destruction");
+
+    ASSERT_TRUE(ll_destroy(list) == 0,
+                "ll_destroy should return 0");
 
     return 1;
 }
 
-// TEST 7: Verificar inserción en cabeza y cola
+// Linked List: Verificar la destruccion cuando la lista es NULL
+int test_ll_destroy_null() {
+    ASSERT_TRUE(ll_destroy(NULL) == -1,
+                "ll_destroy should return -1 for NULL pointer");
+
+    return 1;
+}
+
+// Linked List:: Verificar que ll_create rechaza un puntero de salida NULL
+int test_ll_create_null_pointer() {
+    int result = ll_create(NULL);
+
+    ASSERT_TRUE(result == -1,
+                "ll_create should return -1 for NULL output pointer");
+
+    return 1;
+}
+
+// Linked List:: Verificar inserción en cabeza y cola
 int test_ll_insertions() {
     LinkedList *list = NULL;
-    ll_create(&list);
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
 
     int v1 = 10, v2 = 20, v3 = 30;
 
-    ll_insert_head(list, &v1); // List: 10
-    ll_insert_head(list, &v2); // List: 20 -> 10
-    ll_insert_tail(list, &v3); // List: 20 -> 10 -> 30
+    ASSERT_TRUE(ll_insert_head(list, &v1) == 0,
+                "First head insertion should succeed");
+
+    ASSERT_TRUE(ll_insert_head(list, &v2) == 0,
+                "Second head insertion should succeed");
+
+    ASSERT_TRUE(ll_insert_tail(list, &v3) == 0,
+                "Tail insertion should succeed");
 
     ASSERT_TRUE(list->size == 3, "Size should be 3");
 
     void *out = NULL;
-    ll_get(list, 0, &out);
+
+    ASSERT_TRUE(ll_get(list, 0, &out) == 0,
+                "Getting index 0 should succeed");
     ASSERT_TRUE(*(int*)out == 20, "Index 0 should be 20");
 
-    ll_get(list, 2, &out);
+    ASSERT_TRUE(ll_get(list, 2, &out) == 0,
+                "Getting index 2 should succeed");
     ASSERT_TRUE(*(int*)out == 30, "Index 2 should be 30");
 
     ll_destroy(list);
     return 1;
 }
 
-// TEST 8: Verificar la eliminación y el re-linkeo
-int test_ll_remove() {
+// Linked List: Verificar que ll_get limpia el puntero de salida ante un índice inválido
+int test_ll_get_clears_output_on_error() {
     LinkedList *list = NULL;
-    ll_create(&list);
 
-    int v1 = 10, v2 = 20, v3 = 30;
-    ll_insert_tail(list, &v1);
-    ll_insert_tail(list, &v2);
-    ll_insert_tail(list, &v3);
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
 
-    // Eliminamos el nodo del medio (index 1, valor 20)
-    int result = ll_remove(list, 1);
+    int value = 100;
 
-    ASSERT_TRUE(result == 0, "ll_remove should return 0");
-    ASSERT_TRUE(list->size == 2, "Size should be 2");
+    ASSERT_TRUE(ll_insert_head(list, &value) == 0,
+                "Insertion should succeed");
 
-    void *out = NULL;
-    ll_get(list, 1, &out);
-    ASSERT_TRUE(*(int*)out == 30, "Index 1 should now be 30");
+    void *out = &value;
+
+    ASSERT_TRUE(ll_get(list, 1, &out) == -1,
+                "ll_get should fail for out-of-bounds index");
+
+    ASSERT_TRUE(out == NULL,
+                "Output pointer should be NULL after failure");
 
     ll_destroy(list);
     return 1;
 }
 
-// TEST 9: Verificar el ciclo de vida y operaciones básicas del Stack
+// Linked List:: Verificar la eliminación y el re-linkeo
+int test_ll_remove() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    ASSERT_TRUE(ll_insert_tail(list, &v1) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v2) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v3) == 0,
+                "Third insertion should succeed");
+
+    // Eliminar el nodo del medio
+    ASSERT_TRUE(ll_remove(list, 1) == 0,
+                "Removing middle node should succeed");
+
+    ASSERT_TRUE(list->size == 2, "Size should be 2");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ll_get(list, 1, &out) == 0,
+                "Getting index 1 should succeed");
+    ASSERT_TRUE(*(int*)out == 30,
+                "Index 1 should now be 30");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List: Verificar que ll_get rechaza índices fuera de rango
+int test_ll_get_out_of_bounds() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int value = 100;
+
+    ASSERT_TRUE(ll_insert_head(list, &value) == 0,
+                "Insertion should succeed");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ll_get(list, 1, &out) == -1,
+                "ll_get should return -1 for out-of-bounds index");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List: Verificar que ll_get rechaza un puntero de salida NULL
+int test_ll_get_null_output() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int value = 100;
+
+    ASSERT_TRUE(ll_insert_head(list, &value) == 0,
+                "Insertion should succeed");
+
+    ASSERT_TRUE(ll_get(list, 0, NULL) == -1,
+                "ll_get should return -1 for NULL output pointer");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List:Verificar que la lista permite almacenar elementos NULL
+int test_ll_null_elements() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    ASSERT_TRUE(ll_insert_head(list, NULL) == 0,
+                "ll_insert_head should accept NULL");
+
+    ASSERT_TRUE(ll_insert_tail(list, NULL) == 0,
+                "ll_insert_tail should accept NULL");
+
+    ASSERT_TRUE(ll_get_size(list) == 2,
+                "List size should be 2");
+
+    void *out = (void *)1;
+
+    ASSERT_TRUE(ll_get(list, 0, &out) == 0,
+                "ll_get should succeed for NULL element");
+    ASSERT_TRUE(out == NULL,
+                "Retrieved element should be NULL");
+
+    out = (void *)1;
+
+    ASSERT_TRUE(ll_get(list, 1, &out) == 0,
+                "ll_get should succeed for second NULL element");
+    ASSERT_TRUE(out == NULL,
+                "Retrieved element should be NULL");
+
+    ll_destroy(list);
+    return 1;
+}
+
+int test_ll_size_consistency() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int values[] = {10, 20, 30};
+
+    ASSERT_TRUE(ll_insert_head(list, &values[0]) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 1,
+                "Size should be 1");
+
+    ASSERT_TRUE(ll_insert_tail(list, &values[1]) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 2,
+                "Size should be 2");
+
+    ASSERT_TRUE(ll_insert_tail(list, &values[2]) == 0,
+                "Third insertion should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 3,
+                "Size should be 3");
+
+    ASSERT_TRUE(ll_remove(list, 1) == 0,
+                "Removal should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 2,
+                "Size should be 2 after removal");
+
+    ASSERT_TRUE(ll_remove(list, 0) == 0,
+                "Head removal should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 1,
+                "Size should be 1 after head removal");
+
+    ASSERT_TRUE(ll_remove(list, 0) == 0,
+                "Last removal should succeed");
+    ASSERT_TRUE(ll_get_size(list) == 0,
+                "Size should be 0 after removing all elements");
+
+    ASSERT_TRUE(list->head == NULL,
+                "Head should be NULL when list is empty");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List: Verificar que ll_remove elimina correctamente la cabeza
+int test_ll_remove_head() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    ASSERT_TRUE(ll_insert_tail(list, &v1) == 0, "First insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v2) == 0, "Second insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v3) == 0, "Third insertion should succeed");
+
+    ASSERT_TRUE(ll_remove(list, 0) == 0,
+                "Removing head should succeed");
+
+    ASSERT_TRUE(list->size == 2, "Size should be 2");
+    ASSERT_TRUE(list->head->data == &v2,
+                "New head should contain the second element");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List: Verificar que ll_remove elimina correctamente la cola
+int test_ll_remove_tail() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    ASSERT_TRUE(ll_insert_tail(list, &v1) == 0, "First insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v2) == 0, "Second insertion should succeed");
+    ASSERT_TRUE(ll_insert_tail(list, &v3) == 0, "Third insertion should succeed");
+
+    ASSERT_TRUE(ll_remove(list, 2) == 0,
+                "Removing tail should succeed");
+
+    ASSERT_TRUE(list->size == 2, "Size should be 2");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ll_get(list, 1, &out) == 0,
+                "Getting last element should succeed");
+    ASSERT_TRUE(*(int*)out == 20,
+                "New tail should contain the second element");
+    ASSERT_TRUE(list->head->next->next == NULL,
+                "New tail next pointer should be NULL");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Linked List: Verificar que ll_remove rechaza índices fuera de rango
+int test_ll_remove_out_of_bounds() {
+    LinkedList *list = NULL;
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
+
+    int value = 100;
+
+    ASSERT_TRUE(ll_insert_head(list, &value) == 0,
+                "Insertion should succeed");
+
+    ASSERT_TRUE(ll_remove(list, 1) == -1,
+                "ll_remove should return -1 for out-of-bounds index");
+
+    ASSERT_TRUE(list->size == 1,
+                "List size should remain unchanged");
+
+    ll_destroy(list);
+    return 1;
+}
+
+// Stack: Verificar el ciclo de vida y operaciones básicas del Stack
 int test_stack_basic_operations() {
     Stack *stack = NULL;
     int v1 = 10, v2 = 20, v3 = 30;
@@ -313,7 +585,7 @@ int test_stack_basic_operations() {
     return 1;
 }
 
-// TEST 10: Verificar stack vacío y errores
+// Stack: Verificar stack vacío y errores
 int test_stack_edge_cases() {
     Stack *stack = NULL;
     stack_create(&stack);
@@ -328,7 +600,7 @@ int test_stack_edge_cases() {
     return 1;
 }
 
-// TEST 11: Verificar inserción y recuperación básica
+// Hash Table: Verificar inserción y recuperación básica
 int test_ht_basic_operations() {
     HashTable *table = NULL;
     ht_create(&table, 10);
@@ -349,7 +621,7 @@ int test_ht_basic_operations() {
     return 1;
 }
 
-// TEST 12: Verificar el manejo de colisiones (Chaining)
+// Hash Table: Verificar el manejo de colisiones (Chaining)
 int test_ht_collisions() {
     HashTable *table = NULL;
     ht_create(&table, 1); // Capacidad 1 para forzar colisiones
@@ -375,7 +647,7 @@ int test_ht_collisions() {
     return 1;
 }
 
-// TEST 1: Verificar la eliminación y limpieza
+// Hash Table: Verificar la eliminación y limpieza
 int test_ht_remove() {
     HashTable *table = NULL;
     ht_create(&table, 10);
@@ -393,7 +665,7 @@ int test_ht_remove() {
     return 1;
 }
 
-// TEST 13: Edge Cases - Dynamic Array
+// Dynamic Array: Edge Cases
 int test_da_edge_cases() {
     DynamicArray *array = NULL;
 
@@ -414,27 +686,62 @@ int test_da_edge_cases() {
     return 1;
 }
 
-// TEST 14: Edge Cases - Linked List
+// Linked List: Edge Cases
 int test_ll_edge_cases() {
     LinkedList *list = NULL;
-    ll_create(&list);
+
+    ASSERT_TRUE(ll_create(&list) == 0,
+                "ll_create should succeed");
 
     int val = 10;
-    ll_insert_head(list, &val);
+
+    // Insertar al inicio de una lista vacía
+    ASSERT_TRUE(ll_insert_head(list, &val) == 0,
+                "ll_insert_head should work on empty list");
+
+    ASSERT_TRUE(list->head != NULL,
+                "Head should not be NULL after insertion");
+    ASSERT_TRUE(list->size == 1,
+                "Size should be 1");
 
     // Eliminar el único elemento
-    ASSERT_TRUE(ll_remove(list, 0) == 0, "ll_remove should work for single element");
-    ASSERT_TRUE(list->head == NULL, "Head should be NULL after removing only element");
-    ASSERT_TRUE(list->size == 0, "Size should be 0");
+    ASSERT_TRUE(ll_remove(list, 0) == 0,
+                "ll_remove should work for single element");
+
+    ASSERT_TRUE(list->head == NULL,
+                "Head should be NULL after removing only element");
+    ASSERT_TRUE(list->size == 0,
+                "Size should be 0");
+
+    // Insertar al final de una lista vacía
+    ASSERT_TRUE(ll_insert_tail(list, &val) == 0,
+                "ll_insert_tail should work on empty list");
+
+    ASSERT_TRUE(list->head != NULL,
+                "Head should not be NULL after tail insertion");
+    ASSERT_TRUE(list->head->data == &val,
+                "Inserted element should be stored correctly");
+    ASSERT_TRUE(list->size == 1,
+                "Size should be 1");
+
+    // Eliminar el único elemento
+    ASSERT_TRUE(ll_remove(list, 0) == 0,
+                "ll_remove should work after tail insertion");
+
+    ASSERT_TRUE(list->head == NULL,
+                "Head should be NULL after removing only element");
+    ASSERT_TRUE(list->size == 0,
+                "Size should be 0");
 
     // Intentar borrar en lista vacía
-    ASSERT_TRUE(ll_remove(list, 0) == -1, "ll_remove should fail for empty list");
+    ASSERT_TRUE(ll_remove(list, 0) == -1,
+                "ll_remove should fail for empty list");
 
     ll_destroy(list);
     return 1;
 }
 
-// TEST 15: Edge Cases - Hash Table
+// Hash Table: Edge Cases
 int test_ht_edge_cases() {
     HashTable *table = NULL;
     ht_create(&table, 5);

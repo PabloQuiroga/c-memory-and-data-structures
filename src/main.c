@@ -15,17 +15,31 @@ int test_da_get_null_output();
 int test_da_remove_clears_reference();
 int test_da_get_out_of_bounds();
 int test_da_remove_empty_array();
+int test_da_edge_cases();
+
 int test_ll_create_destroy();
+int test_ll_destroy_null();
+int test_ll_create_null_pointer();
 int test_ll_insertions();
 int test_ll_remove();
+int test_ll_edge_cases();
+int test_ll_get_out_of_bounds();
+int test_ll_get_null_output();
+int test_ll_null_elements();
+int test_ll_size_consistency();
+int test_ll_remove_head();
+int test_ll_remove_tail();
+int test_ll_remove_out_of_bounds();
+int test_ll_get_clears_output_on_error();
+
 int test_stack_basic_operations();
 int test_stack_edge_cases();
+
 int test_ht_basic_operations();
 int test_ht_collisions();
 int test_ht_remove();
-int test_da_edge_cases();
-int test_ll_edge_cases();
 int test_ht_edge_cases();
+
 
 int main() {
     printf("=== RUNNING DYNAMIC ARRAY UNIT TESTS ===\n");
@@ -40,13 +54,25 @@ int main() {
     RUN_TEST(test_da_remove_clears_reference);
     RUN_TEST(test_da_get_out_of_bounds);
     RUN_TEST(test_da_remove_empty_array);
+    RUN_TEST(test_da_edge_cases);
 
     printf("========================================\n");
 
     printf("\n=== RUNNING LINKED LIST UNIT TESTS ===\n");
     RUN_TEST(test_ll_create_destroy);
+    RUN_TEST(test_ll_destroy_null);
     RUN_TEST(test_ll_insertions);
     RUN_TEST(test_ll_remove);
+    RUN_TEST(test_ll_create_null_pointer);
+    RUN_TEST(test_ll_edge_cases);
+    RUN_TEST(test_ll_get_out_of_bounds);
+    RUN_TEST(test_ll_get_null_output);
+    RUN_TEST(test_ll_null_elements);
+    RUN_TEST(test_ll_size_consistency);
+    RUN_TEST(test_ll_remove_head);
+    RUN_TEST(test_ll_remove_tail);
+    RUN_TEST(test_ll_remove_out_of_bounds);
+    RUN_TEST(test_ll_get_clears_output_on_error);
 
     printf("========================================\n");
 
@@ -60,13 +86,9 @@ int main() {
     RUN_TEST(test_ht_basic_operations);
     RUN_TEST(test_ht_collisions);
     RUN_TEST(test_ht_remove);
+    RUN_TEST(test_ht_edge_cases);
 
     printf("======================================\n");
-
-    printf("\n=== RUNNING EDGE CASE TESTS ===\n");
-    RUN_TEST(test_da_edge_cases);
-    RUN_TEST(test_ll_edge_cases);
-    RUN_TEST(test_ht_edge_cases);
 
     printf("All tests completed.\n");
 }
