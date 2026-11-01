@@ -6,6 +6,10 @@
 #include <stdlib.h>
 
 int ll_create(LinkedList **list) {
+    if (list == NULL) return -1;
+
+    *list = NULL;
+
     // Reservamos memoria para la estructura de gestión de la lista
     *list = (LinkedList *)malloc(sizeof(LinkedList));
     if (*list == NULL) return -1;
@@ -86,7 +90,11 @@ size_t ll_get_size(LinkedList *list) {
 }
 
 int ll_get(LinkedList *list, size_t index, void **out_element) {
-    if (list == NULL || out_element == NULL) return -1;
+    if (out_element == NULL) return -1;
+
+    *out_element = NULL;
+
+    if (list == NULL) return -1;
 
     Node *current = list->head;
     size_t current_index = 0;
