@@ -546,57 +546,212 @@ int test_ll_remove_out_of_bounds() {
     return 1;
 }
 
-// Stack: Verificar el ciclo de vida y operaciones básicas del Stack
+// Stack: Verificar el ciclo de vida y las operaciones LIFO
 int test_stack_basic_operations() {
     Stack *stack = NULL;
     int v1 = 10, v2 = 20, v3 = 30;
 
-    // 1. Creación
-    ASSERT_TRUE(stack_create(&stack) == 0, "stack_create should return 0");
-    ASSERT_TRUE(stack_is_empty(stack), "Stack should be empty initially");
+    // Creación
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
+    ASSERT_TRUE(stack_is_empty(stack) == 1,
+                "Stack should be empty initially");
 
-    // 2. Push (LIFO: 10 -> 20 -> 30)
-    stack_push(stack, &v1);
-    stack_push(stack, &v2);
-    stack_push(stack, &v3);
-    ASSERT_TRUE(!stack_is_empty(stack), "Stack should not be empty after push");
+    // Push
+    ASSERT_TRUE(stack_push(stack, &v1) == 0,
+                "First push should succeed");
+    ASSERT_TRUE(stack_push(stack, &v2) == 0,
+                "Second push should succeed");
+    ASSERT_TRUE(stack_push(stack, &v3) == 0,
+                "Third push should succeed");
 
-    // 3. Peek (Debe ser el último que entró: 30)
-    void *top = stack_peek(stack);
-    ASSERT_TRUE(*(int*)top == 30, "Peek should return the last element (30)");
+    ASSERT_TRUE(stack_is_empty(stack) == 0,
+                "Stack should not be empty after push");
 
-    // 4. Pop (Saca el 30, ahora el tope es 20)
+    // Peek
+    void *top = NULL;
+
+    ASSERT_TRUE(stack_peek(stack, &top) == 0,
+                "stack_peek should succeed");
+    ASSERT_TRUE(top == &v3,
+                "Peek should return the last inserted element");
+
+    // Pop
     void *popped = NULL;
-    // Nota: En nuestra implementación actual, pop solo remueve.
-    // Para obtener el valor, hacemos peek antes de pop.
-    top = stack_peek(stack);
-    ASSERT_TRUE(*(int*)top == 30, "Top before pop should be 30");
 
-    // Implementamos la eliminación del tope
-    int pop_res = stack_pop(stack, &popped);
-    // Nota: Revisando stack.c, stack_pop llama a ll_remove(list, 0)
-    ASSERT_TRUE(pop_res == 0, "stack_pop should return 0");
+    ASSERT_TRUE(stack_pop(stack, &popped) == 0,
+                "stack_pop should succeed");
+    ASSERT_TRUE(popped == &v3,
+                "Pop should return the last inserted element");
 
-    // 5. Verificar nuevo tope (debe ser 20)
-    top = stack_peek(stack);
-    ASSERT_TRUE(*(int*)top == 20, "Top after pop should be 20");
+    // Verificar nuevo tope
+    top = NULL;
 
-    stack_destroy(stack);
+    ASSERT_TRUE(stack_peek(stack, &top) == 0,
+                "stack_peek should succeed after pop");
+    ASSERT_TRUE(top == &v2,
+                "Top after pop should be the second element");
+
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed");
+
     return 1;
 }
 
-// Stack: Verificar stack vacío y errores
+// Stack: Verificar stack vacío y condiciones de error
 int test_stack_edge_cases() {
     Stack *stack = NULL;
-    stack_create(&stack);
 
-    // Intentar hacer peek en stack vacío
-    ASSERT_TRUE(stack_peek(stack) == NULL, "Peek on empty stack should return NULL");
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
 
-    // Intentar hacer pop en stack vacío
-    ASSERT_TRUE(stack_pop(stack, NULL) == -1, "Pop on empty stack should return -1");
+    // Peek sobre stack vacío
+    void *out = (void *)1;
 
-    stack_destroy(stack);
+    ASSERT_TRUE(stack_peek(stack, &out) == -1,
+                "Peek on empty stack should return -1");
+    ASSERT_TRUE(out == NULL,
+                "Peek output should be NULL after failure");
+
+    // Pop sobre stack vacío
+    out = (void *)1;
+
+    ASSERT_TRUE(stack_pop(stack, &out) == -1,
+                "Pop on empty stack should return -1");
+    ASSERT_TRUE(out == NULL,
+                "Pop output should be NULL after failure");
+
+    ASSERT_TRUE(stack_is_empty(stack) == 1,
+                "Stack should remain empty");
+
+    // Destrucción
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed");
+
+    return 1;
+}
+
+// Stack: Verificar el almacenamiento y recuperación de elementos NULL
+int test_stack_null_elements() {
+    Stack *stack = NULL;
+
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
+
+    ASSERT_TRUE(stack_push(stack, NULL) == 0,
+                "stack_push should accept NULL");
+
+    ASSERT_TRUE(stack_is_empty(stack) == 0,
+                "Stack should not be empty");
+
+    void *out = (void *)1;
+
+    ASSERT_TRUE(stack_peek(stack, &out) == 0,
+                "stack_peek should succeed for NULL element");
+    ASSERT_TRUE(out == NULL,
+                "Peek should return NULL element");
+
+    out = (void *)1;
+
+    ASSERT_TRUE(stack_pop(stack, &out) == 0,
+                "stack_pop should succeed for NULL element");
+    ASSERT_TRUE(out == NULL,
+                "Pop should return NULL element");
+
+    ASSERT_TRUE(stack_is_empty(stack) == 1,
+                "Stack should be empty after pop");
+
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed");
+
+    return 1;
+}
+
+// Stack: Verificar creación con puntero de salida NULL
+int test_stack_create_null_pointer() {
+    ASSERT_TRUE(stack_create(NULL) == -1,
+                "stack_create should reject NULL output pointer");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un Stack NULL
+int test_stack_push_null_stack() {
+    int value = 10;
+
+    ASSERT_TRUE(stack_push(NULL, &value) == -1,
+                "stack_push should reject NULL stack");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un Stack NULL en pop
+int test_stack_pop_null_stack() {
+    void *out = (void *)1;
+
+    ASSERT_TRUE(stack_pop(NULL, &out) == -1,
+                "stack_pop should reject NULL stack");
+    ASSERT_TRUE(out == NULL,
+                "Pop output should be NULL after failure");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un Stack NULL en peek
+int test_stack_peek_null_stack() {
+    void *out = (void *)1;
+
+    ASSERT_TRUE(stack_peek(NULL, &out) == -1,
+                "stack_peek should reject NULL stack");
+    ASSERT_TRUE(out == NULL,
+                "Peek output should be NULL after failure");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un puntero de salida NULL en peek
+int test_stack_peek_null_output() {
+    Stack *stack = NULL;
+
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
+    ASSERT_TRUE(stack_peek(stack, NULL) == -1,
+                "stack_peek should reject NULL output pointer");
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un puntero de salida NULL en pop
+int test_stack_pop_null_output() {
+    Stack *stack = NULL;
+
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
+    ASSERT_TRUE(stack_pop(stack, NULL) == -1,
+                "stack_pop should reject NULL output pointer");
+    ASSERT_TRUE(stack_is_empty(stack) == 1,
+                "Stack should remain empty after failed pop");
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un Stack NULL en destroy
+int test_stack_destroy_null() {
+    ASSERT_TRUE(stack_destroy(NULL) == -1,
+                "stack_destroy should reject NULL stack");
+
+    return 1;
+}
+
+// Stack: Verificar el rechazo de un Stack NULL en is_empty
+int test_stack_is_empty_null() {
+    ASSERT_TRUE(stack_is_empty(NULL) == -1,
+                "stack_is_empty should reject NULL stack");
+
     return 1;
 }
 

@@ -34,6 +34,15 @@ int test_ll_get_clears_output_on_error();
 
 int test_stack_basic_operations();
 int test_stack_edge_cases();
+int test_stack_null_elements();
+int test_stack_create_null_pointer();
+int test_stack_push_null_stack();
+int test_stack_pop_null_stack();
+int test_stack_peek_null_stack();
+int test_stack_peek_null_output();
+int test_stack_pop_null_output();
+int test_stack_destroy_null();
+int test_stack_is_empty_null();
 
 int test_ht_basic_operations();
 int test_ht_collisions();
@@ -79,6 +88,15 @@ int main() {
     printf("\n=== RUNNING STACK UNIT TESTS ===\n");
     RUN_TEST(test_stack_basic_operations);
     RUN_TEST(test_stack_edge_cases);
+    RUN_TEST(test_stack_null_elements);
+    RUN_TEST(test_stack_create_null_pointer);
+    RUN_TEST(test_stack_push_null_stack);
+    RUN_TEST(test_stack_pop_null_stack);
+    RUN_TEST(test_stack_peek_null_stack);
+    RUN_TEST(test_stack_peek_null_output);
+    RUN_TEST(test_stack_pop_null_output);
+    RUN_TEST(test_stack_destroy_null);
+    RUN_TEST(test_stack_is_empty_null);
 
     printf("================================\n");
 
