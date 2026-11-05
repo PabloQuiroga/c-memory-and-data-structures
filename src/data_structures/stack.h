@@ -17,7 +17,7 @@ int stack_create(Stack **stack);
 int stack_destroy(Stack *stack);
 int stack_push(Stack *stack, void *element);
 int stack_pop(Stack *stack, void **out_element);
-void* stack_peek(Stack *stack);
+int stack_peek(Stack *stack, void **out_element);
 int stack_is_empty(Stack *stack);
 
 #endif
