@@ -5,42 +5,39 @@
 #include "hash_table.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 // Función de Hash DJB2: Convierte un string en un número grande
 static unsigned long hash_function(const char *str) {
     unsigned long hash = 5381;
-    int c;
-    while ((c = *str++)) {
-        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    unsigned char c;
+
+    while ((c = (unsigned char)*str++) != '\0') {
+        hash = hash * 33 + c;
     }
+
     return hash;
 }
 
 int ht_create(HashTable **table, size_t capacity) {
-    *table = (HashTable *)malloc(sizeof(HashTable));
-    if (*table == NULL) return -1;
+    if (table == NULL || capacity == 0) return -1;
 
-    // Creamos el arreglo de punteros a listas
-    (*table)->buckets = (LinkedList **)malloc(capacity * sizeof(LinkedList *));
-    if ((*table)->buckets == NULL) {
-        free(*table);
+    *table = NULL;
+
+    if (capacity > SIZE_MAX / sizeof(LinkedList *)) return -1;
+
+    HashTable *new_table = malloc(sizeof(HashTable));
+    if (new_table == NULL) return -1;
+
+    new_table->buckets = calloc(capacity, sizeof(LinkedList *));
+    if (new_table->buckets == NULL) {
+        free(new_table);
         return -1;
     }
 
-    // Inicializamos cada bucket como una lista vacía
-    for (size_t i = 0; i < capacity; i++) {
-        if (ll_create(&((*table)->buckets[i])) != 0) {
-            // Si falla una, debemos destruir todo lo creado hasta ahora
-            for (size_t j = 0; j < i; j++) {
-                ll_destroy((*table)->buckets[j]);
-            }
-            free((*table)->buckets);
-            free(*table);
-            return -1;
-        }
-    }
+    new_table->capacity = capacity;
+    *table = new_table;
 
-    (*table)->capacity = capacity;
     return 0;
 }
 
@@ -49,90 +46,162 @@ int ht_destroy(HashTable *table) {
 
     for (size_t i = 0; i < table->capacity; i++) {
         LinkedList *list = table->buckets[i];
+
         if (list == NULL) continue;
 
-        // Recorremos la lista manualmente para liberar cada HashEntry
         Node *current = list->head;
+
         while (current != NULL) {
-            Node *next = current->next;
-            // IMPORTANTE: Liberamos la entrada antes que el nodo
-            free(current->data);
-            free(current);
-            current = next;
+            HashEntry *entry = current->data;
+
+            free(entry->key);
+            free(entry);
+
+            current = current->next;
         }
 
-        // Liberamos la estructura de la lista
-        free(list);
+        if (ll_destroy(list) != 0) return -1;
     }
 
     free(table->buckets);
     free(table);
+
     return 0;
 }
 
-int ht_insert(HashTable *table, void *key, void *value) {
-    if (table == NULL || key == NULL || value == NULL) return -1;
-
-    // 1. Calculamos el índice del bucket
-    unsigned long hash = hash_function((const char *)key);
-    size_t index = hash % table->capacity;
-
-    // 2. Creamos la entrada (HashEntry) que guarda clave y valor
-    HashEntry *entry = (HashEntry *)malloc(sizeof(HashEntry));
-    if (entry == NULL) return -1;
-    entry->key = key;
-    entry->value = value;
-
-    // 3. Insertamos la entrada en la lista del bucket correspondiente
-    // Usamos ll_insert_head porque es O(1)
-    return ll_insert_head(table->buckets[index], entry);
-}
-
-int ht_get(HashTable *table, void *key, void **out_value) {
-    if (table == NULL || key == NULL || out_value == NULL) return -1;
-
-    // 1. Calculamos el índice
-    unsigned long hash = hash_function((const char *)key);
-    size_t index = hash % table->capacity;
-
-    // 2. Recorremos la lista del bucket buscando la clave
-    LinkedList *list = table->buckets[index];
-    void *entry_ptr = NULL;
-
-    for (size_t i = 0; i < ll_get_size(list); i++) {
-        ll_get(list, i, &entry_ptr);
-        HashEntry *entry = (HashEntry *)entry_ptr;
-        if (entry->key == key) {
-            *out_value = entry->value;
-            return 0; // ¡Encontrado!
-        }
-    }
-
-    return -1; // No se encontró la clave
-}
-
-int ht_remove(HashTable *table, void *key) {
+int ht_insert(HashTable *table, const char *key, void *value) {
     if (table == NULL || key == NULL) return -1;
 
-    // 1. Calculamos el índice del bucket
-    unsigned long hash = hash_function((const char *)key);
+    unsigned long hash = hash_function(key);
     size_t index = hash % table->capacity;
+
     LinkedList *list = table->buckets[index];
 
-    // 2. Buscamos el elemento en la lista
-    for (size_t i = 0; i < ll_get_size(list); i++) {
-        void *entry_ptr = NULL;
-        ll_get(list, i, &entry_ptr);
-        HashEntry *entry = (HashEntry *)entry_ptr;
+    // Update an existing entry.
+    if (list != NULL) {
+        for (size_t i = 0; i < ll_get_size(list); i++) {
+            void *entry_ptr = NULL;
 
-        if (entry->key == key) {
-            // 3. Liberamos la memoria de la HashEntry antes de remover el nodo
-            free(entry);
+            if (ll_get(list, i, &entry_ptr) != 0) return -1;
 
-            // 4. Removemos el nodo de la lista
-            return ll_remove(list, i);
+            HashEntry *entry = entry_ptr;
+
+            if (strcmp(entry->key, key) == 0) {
+                entry->value = value;
+                return 0;
+            }
         }
     }
 
-    return -1; // Clave no encontrada
+    // Allocate the new entry and copy its key.
+    HashEntry *entry = malloc(sizeof(HashEntry));
+    if (entry == NULL) return -1;
+
+    size_t key_length = strlen(key) + 1;
+    entry->key = malloc(key_length);
+
+    if (entry->key == NULL) {
+        free(entry);
+        return -1;
+    }
+
+    memcpy(entry->key, key, key_length);
+    entry->value = value;
+
+    // Create the bucket list only when needed.
+    if (list == NULL) {
+        if (ll_create(&list) != 0) {
+            free(entry->key);
+            free(entry);
+            return -1;
+        }
+
+        table->buckets[index] = list;
+    }
+
+    if (ll_insert_head(list, entry) != 0) {
+        free(entry->key);
+        free(entry);
+
+        if (ll_get_size(list) == 0) {
+            ll_destroy(list);
+            table->buckets[index] = NULL;
+        }
+
+        return -1;
+    }
+
+    return 0;
+}
+
+int ht_get(HashTable *table, const char *key, void **out_value) {
+    if (out_value == NULL) return -1;
+
+    *out_value = NULL;
+
+    if (table == NULL || key == NULL) return -1;
+
+    unsigned long hash = hash_function(key);
+    size_t index = hash % table->capacity;
+
+    LinkedList *list = table->buckets[index];
+
+    if (list == NULL) return -1;
+
+    for (size_t i = 0; i < ll_get_size(list); i++) {
+        void *entry_ptr = NULL;
+
+        if (ll_get(list, i, &entry_ptr) != 0) return -1;
+
+        HashEntry *entry = entry_ptr;
+
+        if (strcmp(entry->key, key) == 0) {
+            *out_value = entry->value;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+int ht_remove(HashTable *table, const char *key, void **out_value) {
+    if (out_value == NULL) return -1;
+
+    *out_value = NULL;
+
+    if (table == NULL || key == NULL) return -1;
+
+    unsigned long hash = hash_function(key);
+    size_t index = hash % table->capacity;
+
+    LinkedList *list = table->buckets[index];
+
+    if (list == NULL) return -1;
+
+    for (size_t i = 0; i < ll_get_size(list); i++) {
+        void *entry_ptr = NULL;
+
+        if (ll_get(list, i, &entry_ptr) != 0) return -1;
+
+        HashEntry *entry = entry_ptr;
+
+        if (strcmp(entry->key, key) == 0) {
+            void *value = entry->value;
+
+            if (ll_remove(list, i) != 0) return -1;
+
+            free(entry->key);
+            free(entry);
+
+            if (ll_get_size(list) == 0) {
+                if (ll_destroy(list) != 0) return -1;
+                table->buckets[index] = NULL;
+            }
+
+            *out_value = value;
+            return 0;
+        }
+    }
+
+    return -1;
 }
