@@ -48,7 +48,21 @@ int test_ht_basic_operations();
 int test_ht_collisions();
 int test_ht_remove();
 int test_ht_edge_cases();
-
+int test_ht_duplicate_keys();
+int test_ht_null_values();
+int test_ht_empty_keys();
+int test_ht_case_sensitive_keys();
+int test_ht_key_copy();
+int test_ht_bucket_cleanup();
+int test_ht_create_invalid_arguments();
+int test_ht_insert_invalid_arguments();
+int test_ht_get_invalid_arguments();
+int test_ht_remove_invalid_arguments();
+int test_ht_remove_with_collisions();
+int test_ht_destroy();
+int test_ht_update_null_value();
+int test_ht_remove_collision_head();
+int test_ht_remove_collision_tail();
 
 int main() {
     printf("=== RUNNING DYNAMIC ARRAY UNIT TESTS ===\n");
@@ -105,6 +119,21 @@ int main() {
     RUN_TEST(test_ht_collisions);
     RUN_TEST(test_ht_remove);
     RUN_TEST(test_ht_edge_cases);
+    RUN_TEST(test_ht_duplicate_keys);
+    RUN_TEST(test_ht_null_values);
+    RUN_TEST(test_ht_empty_keys);
+    RUN_TEST(test_ht_case_sensitive_keys);
+    RUN_TEST(test_ht_key_copy);
+    RUN_TEST(test_ht_bucket_cleanup);
+    RUN_TEST(test_ht_create_invalid_arguments);
+    RUN_TEST(test_ht_insert_invalid_arguments);
+    RUN_TEST(test_ht_get_invalid_arguments);
+    RUN_TEST(test_ht_remove_invalid_arguments);
+    RUN_TEST(test_ht_remove_with_collisions);
+    RUN_TEST(test_ht_destroy);
+    RUN_TEST(test_ht_update_null_value);
+    RUN_TEST(test_ht_remove_collision_head);
+    RUN_TEST(test_ht_remove_collision_tail);
 
     printf("======================================\n");
 

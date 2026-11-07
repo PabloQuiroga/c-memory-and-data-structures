@@ -758,12 +758,14 @@ int test_stack_is_empty_null() {
 // Hash Table: Verificar inserción y recuperación básica
 int test_ht_basic_operations() {
     HashTable *table = NULL;
-    ht_create(&table, 10);
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+            "ht_create should succeed");
 
     char *key = "Pablo";
     char *val = "Developer";
 
-    ht_insert(table, key, val);
+    ASSERT_TRUE(ht_insert(table, key, val) == 0,
+            "ht_insert should succeed");
 
     void *out = NULL;
     int result = ht_get(table, key, &out);
@@ -772,51 +774,62 @@ int test_ht_basic_operations() {
     ASSERT_TRUE(result == 0, "ht_get should return 0");
     ASSERT_TRUE(out == val, "The pointer retrieved should be the same as the pointer inserted");
 
-    ht_destroy(table);
+    ASSERT_TRUE(ht_destroy(table) == 0, "ht_destroy should succeed");
     return 1;
 }
 
 // Hash Table: Verificar el manejo de colisiones (Chaining)
 int test_ht_collisions() {
     HashTable *table = NULL;
-    ht_create(&table, 1); // Capacidad 1 para forzar colisiones
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+            "ht_create should succeed"); // Capacidad 1 para forzar colisiones
 
     char *k1 = "Key1";
     char *v1 = "Val1";
     char *k2 = "Key2";
     char *v2 = "Val2";
 
-    ht_insert(table, k1, v1);
-    ht_insert(table, k2, v2);
+    ASSERT_TRUE(ht_insert(table, k1, v1) == 0,
+            "ht_insert should succeed for Key1");
+    ASSERT_TRUE(ht_insert(table, k2, v2) == 0,
+            "ht_insert should succeed for Key2");
 
     ASSERT_TRUE(ll_get_size(table->buckets[0]) == 2, "Bucket 0 should have 2 elements");
 
     void *out = NULL;
-    ht_get(table, k1, &out);
+    ASSERT_TRUE(ht_get(table, k1, &out) == 0,
+            "ht_get should succeed for Key1");
     ASSERT_TRUE(out == v1, "Should retrieve Val1 for Key1");
 
-    ht_get(table, k2, &out);
+    ASSERT_TRUE(ht_get(table, k2, &out) == 0,
+            "ht_get should succeed for Key2");
     ASSERT_TRUE(out == v2, "Should retrieve Val2 for Key2");
 
-    ht_destroy(table);
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
     return 1;
 }
 
 // Hash Table: Verificar la eliminación y limpieza
 int test_ht_remove() {
     HashTable *table = NULL;
-    ht_create(&table, 10);
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+            "ht_create should succeed");
 
     char *k = "TestKey";
     char *v = "TestVal";
-    ht_insert(table, k, v);
+    ASSERT_TRUE(ht_insert(table, k, v) == 0,
+            "ht_insert should succeed");
 
-    ASSERT_TRUE(ht_remove(table, k) == 0, "ht_remove should return 0");
+    void *removed_value = NULL;
+    ASSERT_TRUE(ht_remove(table, k, &removed_value) == 0, "ht_remove should return 0");
+    ASSERT_TRUE(removed_value == v, "ht_remove should return the removed value");
 
     void *out = NULL;
     ASSERT_TRUE(ht_get(table, k, &out) == -1, "Key should no longer exist");
 
-    ht_destroy(table);
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
     return 1;
 }
 
@@ -899,19 +912,502 @@ int test_ll_edge_cases() {
 // Hash Table: Edge Cases
 int test_ht_edge_cases() {
     HashTable *table = NULL;
-    ht_create(&table, 5);
-
+    ASSERT_TRUE(ht_create(&table, 5) == 0,
+                "ht_create should succeed");
     void *out = NULL;
     // Buscar en tabla vacía
     ASSERT_TRUE(ht_get(table, "NonExistent", &out) == -1, "ht_get should fail for empty table");
 
     char *k = "Key";
     char *v = "Val";
-    ht_insert(table, k, v);
-
+    ASSERT_TRUE(ht_insert(table, k, v) == 0,
+                "ht_insert should succeed");
     // Eliminar clave que no existe
-    ASSERT_TRUE(ht_remove(table, "WrongKey") == -1, "ht_remove should fail for non-existent key");
+    void *removed_value = NULL;
 
-    ht_destroy(table);
+    ASSERT_TRUE(ht_remove(table, "WrongKey", &removed_value) == -1,
+                "ht_remove should fail for non-existent key");
+
+    ASSERT_TRUE(removed_value == NULL,
+                "Output value should remain NULL when key is not found");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify duplicate key updates
+int test_ht_duplicate_keys() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    char *key = "Language";
+    char *value1 = "Java";
+    char *value2 = "Kotlin";
+
+    ASSERT_TRUE(ht_insert(table, key, value1) == 0,
+                "First insertion should succeed");
+
+    ASSERT_TRUE(ht_insert(table, key, value2) == 0,
+                "Duplicate key insertion should update the value");
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 1,
+            "Duplicate key should not create a new entry");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, key, &out) == 0,
+                "ht_get should find the updated key");
+
+    ASSERT_TRUE(out == value2,
+                "ht_get should return the updated value");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify NULL value handling
+int test_ht_null_values() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    const char *key = "NullValue";
+
+    ASSERT_TRUE(ht_insert(table, key, NULL) == 0,
+                "ht_insert should accept NULL values");
+
+    void *out = (void *) 1;
+
+    ASSERT_TRUE(ht_get(table, key, &out) == 0,
+                "ht_get should find a key with NULL value");
+
+    ASSERT_TRUE(out == NULL,
+                "Retrieved value should be NULL");
+
+    void *removed_value = (void *) 1;
+
+    ASSERT_TRUE(ht_remove(table, key, &removed_value) == 0,
+                "ht_remove should remove a key with NULL value");
+
+    ASSERT_TRUE(removed_value == NULL,
+                "Removed value should be NULL");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify empty string key handling
+int test_ht_empty_keys() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    const char *key = "";
+    char *value = "EmptyKeyValue";
+
+    ASSERT_TRUE(ht_insert(table, key, value) == 0,
+                "ht_insert should accept empty string keys");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, key, &out) == 0,
+                "ht_get should find an empty string key");
+
+    ASSERT_TRUE(out == value,
+                "Retrieved value should match inserted value");
+
+    void *removed_value = NULL;
+
+    ASSERT_TRUE(ht_remove(table, key, &removed_value) == 0,
+                "ht_remove should remove an empty string key");
+
+    ASSERT_TRUE(removed_value == value,
+                "Removed value should match inserted value");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify case-sensitive key comparison
+int test_ht_case_sensitive_keys() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    char *value1 = "Java";
+    char *value2 = "java";
+
+    ASSERT_TRUE(ht_insert(table, "Java", value1) == 0,
+                "First key insertion should succeed");
+
+    ASSERT_TRUE(ht_insert(table, "java", value2) == 0,
+                "Second key insertion should succeed");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, "Java", &out) == 0 && out == value1,
+                "Java should retrieve its own value");
+
+    ASSERT_TRUE(ht_get(table, "java", &out) == 0 && out == value2,
+                "java should retrieve its own value");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify that keys are copied on insertion
+int test_ht_key_copy() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    char key[] = "Original";
+    char *value = "StoredValue";
+
+    ASSERT_TRUE(ht_insert(table, key, value) == 0,
+                "ht_insert should succeed");
+
+    key[0] = 'X';
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, "Original", &out) == 0,
+                "Original key should still be retrievable");
+
+    ASSERT_TRUE(out == value,
+                "Retrieved value should match inserted value");
+
+    ASSERT_TRUE(ht_get(table, key, &out) == -1,
+                "Modified key should not be found");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify bucket cleanup after removing the last entry
+int test_ht_bucket_cleanup() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    ASSERT_TRUE(ht_insert(table, "Key", "Value") == 0,
+                "ht_insert should succeed");
+
+    ASSERT_TRUE(table->buckets[0] != NULL,
+                "Bucket should contain a list after insertion");
+
+    void *removed_value = NULL;
+
+    ASSERT_TRUE(ht_remove(table, "Key", &removed_value) == 0,
+                "ht_remove should succeed");
+
+    ASSERT_TRUE(removed_value != NULL,
+                "Removed value should not be NULL");
+
+    ASSERT_TRUE(table->buckets[0] == NULL,
+                "Bucket should be NULL after removing its last entry");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify ht_create invalid arguments
+int test_ht_create_invalid_arguments() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(NULL, 10) == -1,
+                "ht_create should fail when table is NULL");
+
+    ASSERT_TRUE(ht_create(&table, 0) == -1,
+                "ht_create should fail when capacity is zero");
+
+    ASSERT_TRUE(table == NULL,
+                "Table should remain NULL after failed creation");
+
+    return 1;
+}
+
+// Hash Table: Verify ht_insert invalid arguments
+int test_ht_insert_invalid_arguments() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    ASSERT_TRUE(ht_insert(NULL, "Key", "Value") == -1,
+                "ht_insert should fail when table is NULL");
+
+    ASSERT_TRUE(ht_insert(table, NULL, "Value") == -1,
+                "ht_insert should fail when key is NULL");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify ht_get invalid arguments
+int test_ht_get_invalid_arguments() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    int sentinel = 0;
+    void *out = &sentinel;
+
+    ASSERT_TRUE(ht_get(NULL, "Key", &out) == -1,
+                "ht_get should fail when table is NULL");
+
+    ASSERT_TRUE(out == NULL,
+                "Output value should be reset when table is NULL");
+
+    out = &sentinel;
+
+    ASSERT_TRUE(ht_get(table, NULL, &out) == -1,
+                "ht_get should fail when key is NULL");
+
+    ASSERT_TRUE(out == NULL,
+                "Output value should be reset when key is NULL");
+
+    ASSERT_TRUE(ht_get(table, "Key", NULL) == -1,
+                "ht_get should fail when out_value is NULL");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+
+    return 1;
+}
+
+// Hash Table: Verify ht_remove invalid arguments
+int test_ht_remove_invalid_arguments() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "ht_create should succeed");
+
+    int sentinel = 0;
+    void *out = &sentinel;
+
+    ASSERT_TRUE(ht_remove(NULL, "Key", &out) == -1,
+                "ht_remove should fail when table is NULL");
+
+    ASSERT_TRUE(out == NULL,
+                "Output value should be reset when table is NULL");
+
+    out = &sentinel;
+
+    ASSERT_TRUE(ht_remove(table, NULL, &out) == -1,
+                "ht_remove should fail when key is NULL");
+
+    ASSERT_TRUE(out == NULL,
+                "Output value should be reset when key is NULL");
+
+    ASSERT_TRUE(ht_remove(table, "Key", NULL) == -1,
+                "ht_remove should fail when out_value is NULL");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+
+    return 1;
+}
+
+// Hash Table: Verify removal preserves other colliding entries
+int test_ht_remove_with_collisions() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    char *value1 = "Value1";
+    char *value2 = "Value2";
+    char *value3 = "Value3";
+
+    ASSERT_TRUE(ht_insert(table, "Key1", value1) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key2", value2) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key3", value3) == 0,
+                "Third insertion should succeed");
+
+    void *removed_value = NULL;
+
+    ASSERT_TRUE(ht_remove(table, "Key2", &removed_value) == 0,
+                "Removing the middle entry should succeed");
+    ASSERT_TRUE(removed_value == value2,
+                "Removed value should match Key2 value");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, "Key1", &out) == 0 && out == value1,
+                "Key1 should remain accessible");
+    ASSERT_TRUE(ht_get(table, "Key3", &out) == 0 && out == value3,
+                "Key3 should remain accessible");
+    ASSERT_TRUE(ht_get(table, "Key2", &out) == -1,
+                "Key2 should no longer exist");
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 2,
+                "Bucket should contain two remaining entries");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+            "ht_destroy should succeed");
+    return 1;
+}
+
+// Hash Table: Verify updating a key with a previous NULL value
+int test_ht_update_null_value() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    char *key = "Language";
+    char *value = "Kotlin";
+
+    ASSERT_TRUE(ht_insert(table, key, NULL) == 0,
+                "Insertion with NULL value should succeed");
+
+    ASSERT_TRUE(ht_insert(table, key, value) == 0,
+                "Updating a NULL value should succeed");
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 1,
+            "Updating a key should not create a duplicate entry");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, key, &out) == 0,
+                "ht_get should find the key");
+
+    ASSERT_TRUE(out == value,
+                "ht_get should return the updated value");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+
+    return 1;
+}
+
+// Hash Table: Verify removing the head entry from a collision bucket
+int test_ht_remove_collision_head() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    char *value1 = "Value1";
+    char *value2 = "Value2";
+    char *value3 = "Value3";
+
+    ASSERT_TRUE(ht_insert(table, "Key1", value1) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key2", value2) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key3", value3) == 0,
+                "Third insertion should succeed");
+
+    void *removed_value = NULL;
+
+    ASSERT_TRUE(ht_remove(table, "Key3", &removed_value) == 0,
+                "Removing the head entry should succeed");
+
+    ASSERT_TRUE(removed_value == value3,
+                "Removed value should match Key3 value");
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 2,
+                "Bucket should contain two remaining entries");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, "Key1", &out) == 0 && out == value1,
+                "Key1 should remain accessible");
+    ASSERT_TRUE(ht_get(table, "Key2", &out) == 0 && out == value2,
+                "Key2 should remain accessible");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+
+    return 1;
+}
+
+// Hash Table: Verify removing the tail entry from a collision bucket
+int test_ht_remove_collision_tail() {
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 1) == 0,
+                "ht_create should succeed");
+
+    char *value1 = "Value1";
+    char *value2 = "Value2";
+    char *value3 = "Value3";
+
+    ASSERT_TRUE(ht_insert(table, "Key1", value1) == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key2", value2) == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key3", value3) == 0,
+                "Third insertion should succeed");
+
+    void *removed_value = NULL;
+
+    ASSERT_TRUE(ht_remove(table, "Key1", &removed_value) == 0,
+                "Removing the tail entry should succeed");
+
+    ASSERT_TRUE(removed_value == value1,
+                "Removed value should match Key1 value");
+
+    ASSERT_TRUE(ll_get_size(table->buckets[0]) == 2,
+                "Bucket should contain two remaining entries");
+
+    void *out = NULL;
+
+    ASSERT_TRUE(ht_get(table, "Key2", &out) == 0 && out == value2,
+                "Key2 should remain accessible");
+    ASSERT_TRUE(ht_get(table, "Key3", &out) == 0 && out == value3,
+                "Key3 should remain accessible");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "ht_destroy should succeed");
+
+    return 1;
+}
+
+// Hash Table: Verify destruction of empty and populated tables
+int test_ht_destroy() {
+    HashTable *empty_table = NULL;
+
+    ASSERT_TRUE(ht_create(&empty_table, 10) == 0,
+                "Empty table creation should succeed");
+
+    ASSERT_TRUE(ht_destroy(empty_table) == 0,
+                "Destroying an empty table should succeed");
+
+    HashTable *table = NULL;
+
+    ASSERT_TRUE(ht_create(&table, 10) == 0,
+                "Populated table creation should succeed");
+
+    ASSERT_TRUE(ht_insert(table, "Key1", "Value1") == 0,
+                "First insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key2", "Value2") == 0,
+                "Second insertion should succeed");
+    ASSERT_TRUE(ht_insert(table, "Key3", "Value3") == 0,
+                "Third insertion should succeed");
+
+    ASSERT_TRUE(ht_destroy(table) == 0,
+                "Destroying a populated table should succeed");
+
     return 1;
 }
