@@ -1,7 +1,7 @@
 # Architecture: Generic Dynamic Array
 
 ## 1. Data Structure Design
-The Dynamic Array is implemented using a `struct that manages a contiguous block of memory.
+The Dynamic Array is implemented using a `struct` that manages a contiguous block of memory.
 
 ### Struct Definition
 ```c
@@ -59,14 +59,14 @@ When `size` reaches `capacity`, the array will grow using the following logic:
 2. Allocate a new buffer using `realloc`.
 3. If `realloc` fails, return an error code without losing the original data.
 
-### 3.1 Growth Limitations and Risks
+### 3.1 Growth Limitations and Overflow Protection
 
-The current growth strategy has two potential integer overflow risks:
-- **Capacity Doubling**: Calculating `new_capacity = capacity * 2` may overflow `size_t` if the current capacity is too large. This can produce an incorrect capacity value.
-- **Allocation Size Calculation**: Calculating `new_capacity * sizeof(void *)` may also overflow `size_t`, causing the requested allocation size to be smaller than intended.
+The implementation protects against integer overflow during memory allocation and capacity growth:
 
-These risks must be addressed in the implementation before the Dynamic Array can be considered robust against extreme capacity values.
+- **Initial Allocation:** Before allocating the initial buffer, `da_create` verifies that `initial_capacity` does not exceed `SIZE_MAX / sizeof(void *)`.
+- **Capacity Doubling:** Before calculating `new_capacity = capacity * 2`, `da_add` verifies that `capacity` does not exceed `SIZE_MAX / 2`.
+- **Allocation Size Calculation:** Before allocating the resized buffer, `da_add` verifies that `new_capacity` does not exceed `SIZE_MAX / sizeof(void *)`.
 
-The implementation should validate both calculations before calling `realloc`. If either calculation would overflow, `da_add` must return `-1` without modifying the existing array or losing its allocated buffer and stored elements.
+If any validation fails, the corresponding function returns `-1`. In `da_add`, these checks occur before modifying the array, preserving its existing buffer and stored elements.
 
-The exact validation strategy will be determined during the implementation review.
+The implementation also preserves the original buffer if `realloc` fails.
