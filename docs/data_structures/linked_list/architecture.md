@@ -18,7 +18,7 @@ typedef struct {
 ### Design Justification
 - `struct Node`: Essential for creating the linked structure. The next pointer allows the list to grow dynamically without needing a contiguous block of memory.
 - `LinkedList Wrapper`: By using a separate structure for the list, we can store metadata (like the current size) without having to traverse the entire list every time we need to know its length.
-- `void *data: Ensures the list remains generic, allowing it to store any data type.
+- `void *data`: Ensures the list remains generic, allowing it to store any data type.
 
 ## 2. API Definition (Interface)
 
@@ -66,6 +66,7 @@ The library follows the same error-handling pattern as the Dynamic Array, return
   - Returns `-1` if the list pointer is `NULL` or the index is invalid.
   - Traverses the list to the requested index and assigns the stored pointer to `*out_element`.
   - Returns `0` on success.
+  - A successful lookup may return `NULL` as the stored element. The return code determines whether the lookup succeeded.
   - Runs in \(O(n)\) time.
 
 - `int ll_remove(LinkedList *list, size_t index)`
