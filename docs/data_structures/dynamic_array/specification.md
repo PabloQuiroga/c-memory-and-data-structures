@@ -1,7 +1,7 @@
 # Specification: Generic Dynamic Array
 
 ## 1. Objective
-Implement a generic, dynamically resizable array (Dynamic Array) in C. The implementation must be type-agnostic, allowing the storage of any data type while ensuring strict memory safety and efficiency.
+Implement a generic, dynamically resizable array (Dynamic Array) in C. The implementation must be type-agnostic, allowing the storage of pointers to objects of any data type while providing controlled memory management and efficient operations.
 
 ## 2. Functional Requirements
 
@@ -18,11 +18,14 @@ The Dynamic Array must provide the following functionality:
 ### 2.2 Genericity
 To support any data type, the implementation must use `void*` pointers. The array should store pointers to the data rather than the data itself.
 
+The Dynamic Array owns the internal storage used for its elements, but ownership of the objects referenced by those pointers remains with the caller. The array does not allocate, copy, or free those objects.
+
 ## 3. Technical Constraints & Error Handling
 
 ### 3.1 Memory Safety
-- **No Memory Leaks**: All memory allocated via `malloc` or `realloc` must be explicitly freed.
+- **No Memory Leaks**: All memory allocated internally by the Dynamic Array via `malloc` or `realloc` must be properly released.
 - **Allocation Failure**: The system must gracefully handle cases where memory allocation fails (e.g., `malloc` returns `NULL`), preventing segmentation faults.
+- **Integer Overflow Protection**: Initial allocation size, capacity growth, and resized allocation size calculations must be validated against `SIZE_MAX` to prevent integer overflow.
 
 ### 3.2 Boundary Validation
 - **Out-of-Bounds Access**: Any attempt to access or remove an element outside the current range `[0, size - 1]` must be detected and handled (e.g., returning `NULL` or an error code).
@@ -32,9 +35,11 @@ To support any data type, the implementation must use `void*` pointers. The arra
 | Operation | Time Complexity | Space Complexity |
 | :--- | :--- | :--- |
 | Access by Index | $O(1)$ | $O(1)$ |
-| Append (Average) | $O(1)$ | $O(1)$ |
+| Append (Amortized) | $O(1)$ | $O(1)$ |
 | Append (Worst case) | $O(n)$ | $O(n)$ |
 | Removal | $O(n)$ | $O(1)$ |
+
+Space complexity represents the additional memory required by each operation. In the worst case, `realloc` may allocate a new buffer before releasing the original one, temporarily requiring O(n) additional memory.
 
 ## 5. Edge Case Behavior
 - **Empty Array**: `da_get` and `da_remove` must return `-1` when called on an empty array, because no valid element index exists.
