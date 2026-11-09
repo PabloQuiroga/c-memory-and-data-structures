@@ -39,7 +39,7 @@ Consistent with the portfolio's architecture, the list must use `void*` pointers
 - **Element Ownership**: The list does not own the objects referenced by its `void *data` pointers. Removing a node or destroying the list must not free the referenced objects. Their lifetime remains the caller's responsibility.
 - **No Memory Leaks**: Every node successfully allocated through `malloc` must eventually be freed by `ll_remove` or `ll_destroy`.
 - **Allocation Failure**: If memory allocation for a new node or the list structure fails, the corresponding operation must return `-1` without leaving partially initialized structures or modifying the existing list.
-- **Pointer Safety**: Functions must validate required pointers before dereferencing them. The caller must not access or reuse a list pointer after a successful `ll_destroy` call.
+- **Pointer Safety**: Functions must validate required pointers before dereferencing them. Since `ll_destroy` receives the list pointer by value, it does not set the caller's pointer to `NULL`. The caller must discard the pointer after a successful destruction and must not access or reuse it.
 
 ## 4. Complexity Analysis (Big O)
 
