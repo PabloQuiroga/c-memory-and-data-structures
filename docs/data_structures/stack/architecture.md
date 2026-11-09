@@ -10,7 +10,7 @@ typedef struct {
 } Stack;
 ```
 ### Design Justification
-- `Composition over Inheritance`: By containing a LinkedList, the Stack inherits all its memory safety and genericity without duplicating code.
+- `Composition`: By containing a LinkedList, the Stack reuses its storage and node management capabilities without duplicating code.
 - `Interface Restriction`: The Stack exposes only its own public API, hiding the underlying Linked List operations to ensure the LIFO property is never violated.
 
 ## 2. API Definition
@@ -71,6 +71,6 @@ typedef struct {
 - `stack_destroy()` releases the internal Linked List and the Stack structure, but does not free stored objects.
 - The caller is responsible for managing the lifetime of stored objects.
 - If `stack_push()` fails, the Stack must remain unchanged.
-- If `stack_pop()` or `stack_peek()` fails, the output pointer must remain `NULL`.
+- If `stack_pop()` or `stack_peek()` fails and the output pointer is valid, the output value must remain `NULL`.
 - A successful `stack_pop()` or `stack_peek()` may return `NULL` when the stored element is `NULL`.
 - The Stack must not access Linked List internals directly.
