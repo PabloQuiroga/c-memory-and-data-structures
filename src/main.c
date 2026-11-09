@@ -43,6 +43,7 @@ int test_stack_peek_null_output();
 int test_stack_pop_null_output();
 int test_stack_destroy_null();
 int test_stack_is_empty_null();
+int test_stack_destroy_with_elements();
 
 int test_ht_basic_operations();
 int test_ht_collisions();
@@ -111,6 +112,7 @@ int main() {
     RUN_TEST(test_stack_pop_null_output);
     RUN_TEST(test_stack_destroy_null);
     RUN_TEST(test_stack_is_empty_null);
+    RUN_TEST(test_stack_destroy_with_elements);
 
     printf("================================\n");
 

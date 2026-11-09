@@ -592,6 +592,20 @@ int test_stack_basic_operations() {
     ASSERT_TRUE(top == &v2,
                 "Top after pop should be the second element");
 
+    // Completar extracción LIFO
+    ASSERT_TRUE(stack_pop(stack, &popped) == 0,
+                "Second pop should succeed");
+    ASSERT_TRUE(popped == &v2,
+                "Second pop should return the second element");
+
+    ASSERT_TRUE(stack_pop(stack, &popped) == 0,
+                "Third pop should succeed");
+    ASSERT_TRUE(popped == &v1,
+                "Third pop should return the first element");
+
+    ASSERT_TRUE(stack_is_empty(stack) == 1,
+                "Stack should be empty after all elements are popped");
+
     ASSERT_TRUE(stack_destroy(stack) == 0,
                 "stack_destroy should succeed");
 
@@ -743,6 +757,30 @@ int test_stack_pop_null_output() {
 int test_stack_destroy_null() {
     ASSERT_TRUE(stack_destroy(NULL) == -1,
                 "stack_destroy should reject NULL stack");
+
+    return 1;
+}
+
+// Stack: Verify destruction with stored elements
+int test_stack_destroy_with_elements() {
+    Stack *stack = NULL;
+    int v1 = 10, v2 = 20, v3 = 30;
+
+    ASSERT_TRUE(stack_create(&stack) == 0,
+                "stack_create should succeed");
+
+    ASSERT_TRUE(stack_push(stack, &v1) == 0,
+                "First push should succeed");
+    ASSERT_TRUE(stack_push(stack, &v2) == 0,
+                "Second push should succeed");
+    ASSERT_TRUE(stack_push(stack, &v3) == 0,
+                "Third push should succeed");
+
+    ASSERT_TRUE(stack_destroy(stack) == 0,
+                "stack_destroy should succeed with stored elements");
+
+    ASSERT_TRUE(v1 == 10 && v2 == 20 && v3 == 30,
+                "Stored objects should remain unchanged after destruction");
 
     return 1;
 }
