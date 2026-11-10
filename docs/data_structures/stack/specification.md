@@ -7,11 +7,11 @@ Implement a generic Stack (Last-In, First-Out) by leveraging the existing Linked
 
 ### 2.1 Core Operations
 
-- **Initialization (`stack_create`)**: Create an empty stack. Returns `0` on success or `-1` if the output pointer is `NULL` or memory allocation fails. The output pointer must be initialized to `NULL` before allocation.
+- **Initialization (`stack_create`)**: Create an empty stack. Returns `0` on success or `-1` if the output pointer is `NULL` or memory allocation fails. The output pointer is initialized to `NULL` before memory allocation.
 - **Push (`stack_push`)**: Add an element to the top of the stack. Accepts `NULL` elements. Returns `0` on success or `-1` if the stack pointer is `NULL` or memory allocation fails. Time complexity: O(1).
 - **Pop (`stack_pop`)**: Remove and return the top element. Returns `0` on success or `-1` if the stack pointer is `NULL`, the output pointer is `NULL`, or the stack is empty. The output pointer must be initialized to `NULL` before accessing the stack. The stored object is not freed. Time complexity: O(1).
 - **Peek (`stack_peek`)**: Return the top element without removing it. Returns `0` on success or `-1` if the stack pointer is `NULL`, the output pointer is `NULL`, or the stack is empty. The output pointer must be initialized to `NULL` before accessing the stack. Time complexity: O(1).
-- **IsEmpty (`stack_is_empty`)**: Check whether the stack contains any elements. Returns `1` if empty, `0` if not empty, and `-1` if the stack pointer is `NULL`. Time complexity: O(1).
+- **IsEmpty (`stack_is_empty`)**: Check whether the stack contains any elements. Returns `1` if empty, `0` if not empty, and `-1` if the stack pointer or its internal Linked List pointer is `NULL`. Time complexity: O(1).
 - **Memory Cleanup (`stack_destroy`)**: Release the Stack and its internal Linked List structure. Returns `0` on success or `-1` if the stack pointer is `NULL` or the internal Linked List cannot be destroyed. Stored objects must not be freed.
 
 ### 2.2 Implementation Constraint
