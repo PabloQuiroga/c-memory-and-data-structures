@@ -76,6 +76,9 @@ Documentación: [Especificación](docs/data_structures/hash_table/specification.
 - **Integración continua:** GitHub Actions.
 - **Conceptos:** memoria dinámica, punteros, `void*`, estructuras genéricas, manejo de errores, complejidad algorítmica y reutilización de componentes.
 
+## Pruebas
+El proyecto incluye una suite de pruebas automatizadas que valida las operaciones principales de cada estructura de datos, casos límite (*edge cases*), argumentos inválidos y manejo de errores.
+
 ## Estructura del repositorio
 
 ```text
@@ -84,7 +87,6 @@ Documentación: [Especificación](docs/data_structures/hash_table/specification.
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
-│   │
 │   ├── data_structures/
 │   │   ├── dynamic_array/
 │   │   │   ├── specification.md
